@@ -1,81 +1,116 @@
-/// We derive Deserialize/Serialize so we can persist app state on shutdown.
-#[derive(serde::Deserialize, serde::Serialize)]
-#[serde(default)] // if we add new fields, give them default values when deserializing old state
-pub struct TemplateApp {
-    // Example stuff:
-    label: String,
+use std::sync::mpsc;
+use std::thread;
+use anyhow::Result;
+use serde_json::Value;
+use crate::api;
+use crate::types::{Category};
 
-    // this how you opt-out of serialization of a member
+enum Update {
+    InitCategory,
+    CategoriesLoaded(Result<Vec<Category>>),
+}
+
+enum State {
+    Idle,
+    Busy,
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
+#[serde(default)]
+pub struct TemplateApp {
     #[serde(skip)]
-    value: f32,
+    update_tx: mpsc::Sender<Update>,
+    #[serde(skip)]
+    update_rx: mpsc::Receiver<Update>,
+    #[serde(skip)]
+    state: State,
+    load_err: Option<String>,
+    categories: Vec<Category>,
+    category: Option<Category>,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
+        let (update_tx, update_rx) = mpsc::channel();
+
         Self {
-            // Example stuff:
-            label: "Hello World!".to_owned(),
-            value: 2.7,
+            update_tx,
+            update_rx,
+            state: State::Idle,
+            load_err: None,
+            categories: vec![],
+            category: None,
         }
     }
 }
 
 impl TemplateApp {
-    /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        // This is also where you can customized the look at feel of egui using
-        // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
-
-        // Load previous app state (if any).
-        // Note that you must enable the `persistence` feature for this to work.
         if let Some(storage) = cc.storage {
             return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
         }
 
-        Default::default()
+        let this: Self = Default::default();
+
+        // load categories
+        this.update_tx.send(Update::InitCategory).unwrap();
+
+        this
+    }
+
+    fn load_category(&mut self, ctx: &egui::Context) {
+        self.state = State::Busy;
+
+        let update_tx = self.update_tx.clone();
+        let ctx = ctx.clone();
+
+        thread::spawn(move || {
+            let data = api::load_category();
+            update_tx.send(Update::CategoriesLoaded(data)).unwrap();
+            ctx.request_repaint();
+        });
+    }
+
+    fn load_data(&mut self, ctx: &egui::Context) {
+        self.state = State::Busy;
+
+        let update_tx = self.update_tx.clone();
+        let ctx = ctx.clone();
+        let category = self.category.clone();
+
+        thread::spawn(move || {
+            //
+        });
     }
 }
 
 impl eframe::App for TemplateApp {
-    /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
     }
 
-    /// Called each time the UI needs repainting, which may be many times per second.
-    /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let Self { label, value } = self;
-
-        // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
-        // Tip: a good default choice is to just keep the `CentralPanel`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
-
-        #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
-            egui::menu::bar(ui, |ui| {
-                ui.menu_button("File", |ui| {
-                    if ui.button("Quit").clicked() {
-                        _frame.close();
+        while let Ok(update) = self.update_rx.try_recv() {
+            match update {
+                Update::InitCategory => {
+                    self.load_category(ctx);
+                }
+                Update::CategoriesLoaded(result) => match result {
+                    Ok(data) => {
+                        self.categories = data;
                     }
-                });
-            });
-        });
+                    Err(err) => {
+                        self.state = State::Idle;
+                        self.load_err = Some(err.to_string());
+                    }
+                },
+            }
+        }
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("Side Panel");
 
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(label);
-            });
-
-            ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                *value += 1.0;
-            }
+            //
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 ui.horizontal(|ui| {
@@ -93,24 +128,15 @@ impl eframe::App for TemplateApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
+            match &mut self.state {
+                State::Idle => {
 
-            ui.heading("eframe template");
-            ui.hyperlink("https://github.com/emilk/eframe_template");
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
-            egui::warn_if_debug_build(ui);
+                }
+                State::Busy => {
+                    ui.spinner();
+                    ui.heading("Loading data...");
+                }
+            }
         });
-
-        if false {
-            egui::Window::new("Window").show(ctx, |ui| {
-                ui.label("Windows can be moved by dragging them.");
-                ui.label("They are automatically sized based on contents.");
-                ui.label("You can turn on resizing and scrolling if you like.");
-                ui.label("You would normally chose either panels OR windows.");
-            });
-        }
     }
 }
