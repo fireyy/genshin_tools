@@ -60,6 +60,7 @@ impl TemplateApp {
     }
 
     fn load_category(&mut self, ctx: &egui::Context) {
+        info!("load category");
         self.state = State::Busy;
 
         let update_tx = self.update_tx.clone();
@@ -178,7 +179,7 @@ impl eframe::App for TemplateApp {
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
                     for cate in self.categories.clone() {
-                        let mut is_open = self.selected_category == cate.name;
+                        let mut is_open = self.selected_category == cate.value;
                         let resp = ui.toggle_value(&mut is_open, cate.name);
                         if resp.clicked() {
                             self.load_all_data(ctx, cate.value);
