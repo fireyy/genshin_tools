@@ -9,12 +9,13 @@ use cached_network_image::{
     FetchImage, FetchQueue, ImageCache, ImageKind,
 };
 use crate::api;
-use crate::types::{Category, Artifact};
+use crate::types::{Category, Artifact, Character};
 use crate::widgets::{ArtifactCard};
 use crate::util::{gen_image, gen_artifact_icon, setup_custom_fonts};
 
 enum Update {
     CategoriesLoaded(Result<Vec<Category>>),
+    TabsLoaded(Result<Vec<String>>),
     DataLoaded(Result<Value>),
 }
 
@@ -30,6 +31,8 @@ pub struct TemplateApp {
     load_err: Option<String>,
     categories: Vec<Category>,
     selected_category: String,
+    tabs: Vec<String>,
+    selected_tab: String,
     data: Value,
     fetch_queue: FetchQueue<Image>,
     net_images: ImageCache,
@@ -48,6 +51,8 @@ impl TemplateApp {
             load_err: None,
             categories: vec![],
             selected_category: String::new(),
+            tabs: vec![],
+            selected_tab: String::new(),
             data: Value::Null,
             fetch_queue: FetchQueue::create(cc.egui_ctx.clone()),
             net_images: ImageCache::default(),
@@ -73,7 +78,7 @@ impl TemplateApp {
         });
     }
 
-    fn load_all_data(&mut self, ctx: &egui::Context, path: String) {
+    fn load_tab_data(&mut self, ctx: &egui::Context, path: String) {
         self.state = State::Busy;
         self.selected_category = path.clone();
 
@@ -81,7 +86,22 @@ impl TemplateApp {
         let ctx = ctx.clone();
 
         thread::spawn(move || {
-            let data = api::load_all_data(path);
+            let data = api::load_tab_data(path);
+            update_tx.send(Update::TabsLoaded(data)).unwrap();
+            ctx.request_repaint();
+        });
+    }
+
+    fn load_data(&mut self, ctx: &egui::Context, path: String) {
+        self.state = State::Busy;
+        self.selected_tab = path.clone();
+
+        let update_tx = self.update_tx.clone();
+        let ctx = ctx.clone();
+        let path = format!("{}/{}", self.selected_category, path);
+
+        thread::spawn(move || {
+            let data = api::load_data(path);
             update_tx.send(Update::DataLoaded(data)).unwrap();
             ctx.request_repaint();
         });
@@ -90,26 +110,24 @@ impl TemplateApp {
     fn show_conent(&mut self, ui: &mut egui::Ui) -> Result<()> {
         let cate = self.selected_category.as_str();
         let data = self.data.clone();
+
+        if data.is_null() {
+            ui.centered_and_justified(|ui| {
+                ui.label("There are no data to display.");
+            });
+            return Ok(())
+        }
         
         match cate {
             "artifacts" => {
-                let data: Vec<Artifact> = serde_json::from_value(data)?;
-                let row_height = 100.0;
-                egui::ScrollArea::vertical()
-                    .auto_shrink([false; 2])
-                    .id_source("content")
-                    .show_rows(
-                        ui,
-                        row_height,
-                        data.len(),
-                        |ui, row_range| {
-                        for row in row_range {
-                            let d = data.get(row).unwrap();
-                            let imgs = gen_artifact_icon(d.name.clone());
-                            self.add_images(imgs);
-                            ArtifactCard::show(ui, d.clone(), &self.net_images);
-                        }
-                    });
+                let data: Artifact = serde_json::from_value(data)?;
+                let imgs = gen_artifact_icon(data.name.clone());
+                self.add_images(imgs);
+                ArtifactCard::show(ui, data.clone(), &self.net_images);
+            }
+            "characters" => {
+                let data: Character = serde_json::from_value(data)?;
+                info!("Character data: {:?}", data);
             }
             _ => {}                
         }
@@ -160,6 +178,16 @@ impl eframe::App for TemplateApp {
                         self.load_err = Some(err.to_string());
                     }
                 },
+                Update::TabsLoaded(result) => match result {
+                    Ok(data) => {
+                        self.state = State::Idle;
+                        self.tabs = data;
+                    }
+                    Err(err) => {
+                        self.state = State::Idle;
+                        self.load_err = Some(err.to_string());
+                    }
+                },
                 Update::DataLoaded(result) => match result {
                     Ok(data) => {
                         self.state = State::Idle;
@@ -182,7 +210,7 @@ impl eframe::App for TemplateApp {
                         let mut is_open = self.selected_category == cate.value;
                         let resp = ui.toggle_value(&mut is_open, cate.name);
                         if resp.clicked() {
-                            self.load_all_data(ctx, cate.value);
+                            self.load_tab_data(ctx, cate.value);
                         }
                     }
                 });
@@ -190,6 +218,22 @@ impl eframe::App for TemplateApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            egui::ScrollArea::horizontal()
+                // .auto_shrink([false; 2])
+                .id_source("tabs")
+                .show(ui, |ui| {
+                    ui.horizontal(|ui| {
+                        for tab in self.tabs.clone() {
+                            let resp = ui.selectable_value(&mut self.selected_tab, tab.clone(), tab.clone());
+                            if resp.clicked() {
+                                self.load_data(ctx, tab.clone());
+                            }
+                        }
+                    });
+                });
+            
+            ui.separator();
+
             match &mut self.state {
                 State::Idle => {
                     self.show_conent(ui).unwrap();

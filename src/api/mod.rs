@@ -32,10 +32,18 @@ pub fn load_category() -> Result<Vec<Category>> {
     Ok(categories)
 }
 
-pub fn load_all_data(path: String) -> Result<Value> {
-    let res = GenshinDev::fetch(format!("{path}/all"))?;
+pub fn load_data(path: String) -> Result<Value> {
+    let res = GenshinDev::fetch(format!("{path}"))?;
     tracing::debug!("load data: {:?}", res);
     let data: Value = serde_json::from_str(&res.text()?)?;
+
+    Ok(data)
+}
+
+pub fn load_tab_data(path: String) -> Result<Vec<String>> {
+    let res = GenshinDev::fetch(format!("{path}"))?;
+    tracing::debug!("load data: {:?}", res);
+    let data: Vec<String> = serde_json::from_str(&res.text()?)?;
 
     Ok(data)
 }

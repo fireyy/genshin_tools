@@ -2,6 +2,10 @@ fn default_string() -> String {
     "-".to_string()
 }
 
+fn default_usize() -> u8 {
+    0
+}
+
 #[derive(Clone, Debug)]
 pub struct Category {
     pub name: String,
@@ -42,6 +46,7 @@ pub struct Character {
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Talent {
     pub description: String,
+    #[serde(default = "default_usize")]
     pub level: u8,
     pub name: String,
     pub unlock: String,
