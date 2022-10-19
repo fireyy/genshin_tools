@@ -3,4 +3,8 @@
 mod app;
 mod api;
 mod types;
+mod widgets;
+mod util;
+mod constants;
+mod theme;
 pub use app::TemplateApp;

@@ -1,12 +1,13 @@
 use reqwest::blocking::{get, Response};
 use anyhow::Result;
 use super::Api;
+use crate::constants::GENSHINDEV_URL;
 
 pub struct GenshinDev {}
 
 impl Api for GenshinDev {
     fn build_queue(path: String) -> String {
-        format!("https://api.genshin.dev/{}", path)
+        format!("{}/{}", *GENSHINDEV_URL, path)
     }
 
     fn fetch(path: String) -> Result<Response> {

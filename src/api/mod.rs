@@ -31,3 +31,11 @@ pub fn load_category() -> Result<Vec<Category>> {
 
     Ok(categories)
 }
+
+pub fn load_all_data(path: String) -> Result<Value> {
+    let res = GenshinDev::fetch(format!("{path}/all"))?;
+    tracing::debug!("load data: {:?}", res);
+    let data: Value = serde_json::from_str(&res.text()?)?;
+
+    Ok(data)
+}
