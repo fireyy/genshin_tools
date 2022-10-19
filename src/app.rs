@@ -12,6 +12,7 @@ use crate::api;
 use crate::types::{Category, Artifact, Character};
 use crate::widgets::{ArtifactCard};
 use crate::util::{gen_image, gen_artifact_icon, setup_custom_fonts};
+use crate::theme::Icon;
 
 enum Update {
     CategoriesLoaded(Result<Vec<Category>>),
@@ -206,11 +207,14 @@ impl eframe::App for TemplateApp {
 
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
-                    for cate in self.categories.clone() {
-                        let mut is_open = self.selected_category == cate.value;
-                        let resp = ui.toggle_value(&mut is_open, cate.name);
-                        if resp.clicked() {
-                            self.load_tab_data(ctx, cate.value);
+                    for cate in &self.categories.clone() {
+                        let select = egui::SelectableLabel::new(
+                            self.selected_category == cate.value, 
+                            egui::RichText::new(format!("{} {}", Icon::WEAPON.icon, &cate.name))
+                        );
+                        if ui.add(select).clicked() {
+                            self.selected_category = cate.value.clone();
+                            self.load_tab_data(ctx, cate.value.clone());
                         }
                     }
                 });
@@ -224,7 +228,11 @@ impl eframe::App for TemplateApp {
                 .show(ui, |ui| {
                     ui.horizontal(|ui| {
                         for tab in self.tabs.clone() {
-                            let resp = ui.selectable_value(&mut self.selected_tab, tab.clone(), tab.clone());
+                            let resp = ui.selectable_value(
+                                &mut self.selected_tab, 
+                                tab.clone(), 
+                                tab.clone()
+                            );
                             if resp.clicked() {
                                 self.load_data(ctx, tab.clone());
                             }
@@ -239,8 +247,9 @@ impl eframe::App for TemplateApp {
                     self.show_conent(ui).unwrap();
                 }
                 State::Busy => {
-                    ui.spinner();
-                    ui.heading("Loading data...");
+                    ui.centered_and_justified(|ui| {
+                        ui.spinner();
+                    });
                 }
             }
         });

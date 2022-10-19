@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use eframe::egui;
 
 pub const ICON_FONT: &[u8] = include_bytes!("../../assets/iconfont.ttf");
@@ -19,13 +21,27 @@ const fn ic(c: &'static str) -> Icon {
 }
 
 impl Icon {
-  pub const Star: Self = ic("\u{e693}");
-  pub const Flower: Self = ic("\u{e606}");
-  pub const Plume: Self = ic("\u{e607}");
-  pub const Sands: Self = ic("\u{e608}");
-  pub const Circle: Self = ic("\u{e60a}");
-  pub const Goblet: Self = ic("\u{e60c}");
-  pub const Anemo: Self = ic("\u{e60d}");
+  pub const STAR: Self = ic("\u{e693}");
+  pub const FLOWER: Self = ic("\u{e606}");
+  pub const PLUME: Self = ic("\u{e607}");
+  pub const SANDS: Self = ic("\u{e608}");
+  pub const CIRCLE: Self = ic("\u{e60a}");
+  pub const GOBLET: Self = ic("\u{e60c}");
+  pub const ANEMO: Self = ic("\u{e60d}");
+  pub const CRYO: Self = ic("\u{e60e}");
+  pub const DENDRO: Self = ic("\u{e60f}");
+  pub const ELECTRO: Self = ic("\u{e610}");
+  pub const GEO: Self = ic("\u{e611}");
+  pub const HYDRO: Self = ic("\u{e612}");
+  pub const PYRO: Self = ic("\u{e613}");
+  pub const AMBER: Self = ic("\u{e615}");
+  pub const WEAPON: Self = ic("\u{e616}");
+  pub const ITEM: Self = ic("\u{e617}");
+  pub const TASK: Self = ic("\u{e618}");
+  pub const TOOL: Self = ic("\u{e619}");
+  pub const ARTIFACT: Self = ic("\u{e61a}");
+  pub const ORE: Self = ic("\u{e61b}");
+  pub const MATERIAL: Self = ic("\u{e61c}");
 
   pub fn color(self, color: egui::Color32) -> Self {
     let mut this = self;

@@ -39,7 +39,7 @@ impl ArtifactCard {
                   ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                     // ui.label(RichText::new(format!("Rarity: {}", data.max_rarity)).text_style(TextStyle::Small).color(ui.style().visuals.weak_text_color()));
                     for _ in 0..data.max_rarity {
-                      Icon::Star.size(12.0).color(Color32::YELLOW).show(ui);
+                      Icon::STAR.size(12.0).color(Color32::YELLOW).show(ui);
                     }
                   });
                 });
