@@ -1,5 +1,4 @@
-use egui::{Color32, CursorIcon, Rect, Rounding, Sense, Ui};
-use crate::util::map_to_pixel;
+use egui::{Color32, Rounding, Ui};
 
 #[derive(Clone)]
 pub struct Style {
@@ -149,88 +148,5 @@ impl Style {
         visuals.widgets.hovered.rounding = rounding;
         visuals.widgets.active.rounding = rounding;
         visuals.widgets.open.rounding = rounding;
-    }
-
-    pub fn hsplit(&self, ui: &mut Ui, fraction: &mut f32, rect: Rect) -> (Rect, Rect, Rect) {
-        let pixels_per_point = ui.ctx().pixels_per_point();
-
-        let mut separator = rect;
-
-        let midpoint = rect.min.x + rect.width() * *fraction;
-        separator.min.x = midpoint - self.separator_size * 0.5;
-        separator.max.x = midpoint + self.separator_size * 0.5;
-
-        let response = ui
-            .allocate_rect(separator, Sense::click_and_drag())
-            .on_hover_cursor(CursorIcon::ResizeHorizontal);
-
-        {
-            let delta = response.drag_delta().x;
-            let range = rect.max.x - rect.min.x;
-            let min = (self.separator_extra / range).min(1.0);
-            let max = 1.0 - min;
-            let (min, max) = (min.min(max), max.max(min));
-            *fraction = (*fraction + delta / range).clamp(min, max);
-        }
-
-        let midpoint = rect.min.x + rect.width() * *fraction;
-        separator.min.x = map_to_pixel(
-            midpoint - self.separator_size * 0.5,
-            pixels_per_point,
-            f32::round,
-        );
-        separator.max.x = map_to_pixel(
-            midpoint + self.separator_size * 0.5,
-            pixels_per_point,
-            f32::round,
-        );
-
-        (
-            rect.intersect(Rect::everything_right_of(separator.max.x)),
-            separator,
-            rect.intersect(Rect::everything_left_of(separator.min.x)),
-        )
-    }
-
-    pub fn vsplit(&self, ui: &mut Ui, fraction: &mut f32, rect: Rect) -> (Rect, Rect, Rect) {
-        let pixels_per_point = ui.ctx().pixels_per_point();
-
-        let mut separator = rect;
-
-        let midpoint = rect.min.y + rect.height() * *fraction;
-        separator.min.y = midpoint - self.separator_size * 0.5;
-        separator.max.y = midpoint + self.separator_size * 0.5;
-
-        let response = ui
-            .allocate_rect(separator, Sense::click_and_drag())
-            .on_hover_cursor(CursorIcon::ResizeVertical);
-
-        {
-            let delta = response.drag_delta().y;
-            let range = rect.max.y - rect.min.y;
-
-            let min = (self.separator_extra / range).min(1.0);
-            let max = 1.0 - min;
-            let (min, max) = (min.min(max), max.max(min));
-            *fraction = (*fraction + delta / range).clamp(min, max);
-        }
-
-        let midpoint = rect.min.y + rect.height() * *fraction;
-        separator.min.y = map_to_pixel(
-            midpoint - self.separator_size * 0.5,
-            pixels_per_point,
-            f32::round,
-        );
-        separator.max.y = map_to_pixel(
-            midpoint + self.separator_size * 0.5,
-            pixels_per_point,
-            f32::round,
-        );
-
-        (
-            rect.intersect(Rect::everything_above(separator.min.y)),
-            separator,
-            rect.intersect(Rect::everything_below(separator.max.y)),
-        )
     }
 }

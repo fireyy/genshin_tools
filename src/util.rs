@@ -3,7 +3,6 @@ use cached_network_image::{
 };
 
 use crate::constants::{GENSHINDEV_URL, ARTIFACT_TYPE};
-use crate::theme::ICON_FONT;
 
 pub fn gen_image(url: String, kind: ImageKind) -> Image {
     let uuid = ImageStore::<Image>::get_id(&url) //
@@ -29,9 +28,4 @@ pub fn gen_artifact_icon(name: String) -> Vec<String> {
         .map(|a| format!("{}/artifacts/{}/{}.png", *GENSHINDEV_URL, name, a))
         .collect();
     arr
-}
-
-#[inline(always)]
-pub fn map_to_pixel(point: f32, ppi: f32, map: fn(f32) -> f32) -> f32 {
-    map(point * ppi) / ppi
 }
