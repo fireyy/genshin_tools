@@ -12,21 +12,16 @@ pub fn setup_custom_fonts(ctx: &egui::Context) {
         egui::FontData::from_static(ICON_FONT),
     );
 
-    fonts.families.insert(
-        egui::FontFamily::Name("iconfont".into()),
-        vec!["Hack".to_owned(), "iconfont".into()],
-    );
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, "iconfont".to_owned());
 
     fonts
         .families
-        .get_mut(&egui::FontFamily::Proportional)
-        .unwrap()
-        .push("iconfont".to_owned());
-    
-    fonts
-        .families
-        .get_mut(&egui::FontFamily::Monospace)
-        .unwrap()
+        .entry(egui::FontFamily::Monospace)
+        .or_default()
         .push("iconfont".to_owned());
 
     ctx.set_fonts(fonts);
