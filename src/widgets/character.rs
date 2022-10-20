@@ -1,10 +1,9 @@
 use eframe::egui::{
-    Ui, Frame, vec2, Color32, Rounding, style::Margin,
+    Ui, Frame, vec2,
 };
 use cached_network_image::ImageCache;
 use crate::types::Character;
-use crate::util::get_image;
-use crate::theme::Icon;
+use crate::util::{get_image, gen_star};
 use super::TalentCard;
 
 macro_rules! character_grid {
@@ -31,7 +30,7 @@ impl CharacterCard {
                     ("Title", &data.title),
                     ("Nation", &data.nation),
                     ("Birthday", &data.birthday),
-                    ("Rarity", format!("{}", data.rarity)),
+                    ("Rarity", gen_star(data.rarity)),
                     ("Vision", &data.vision),
                     ("Weapon", &data.weapon),
                     ("Affiliation", &data.affiliation),

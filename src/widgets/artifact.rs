@@ -3,8 +3,7 @@ use eframe::egui::{
 };
 use cached_network_image::ImageCache;
 use crate::types::Artifact;
-use crate::util::get_image;
-use crate::theme::Icon;
+use crate::util::{get_image, gen_star};
 
 pub struct ArtifactCard;
 
@@ -32,11 +31,7 @@ impl ArtifactCard {
                 ui.horizontal(|ui| {
                   ui.label(data.name);
                   ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    let mut star = String::new();
-                    for _ in 0..data.max_rarity {
-                      star.push_str(Icon::STAR.icon);
-                    }
-                    ui.label(RichText::new(format!("Rarity: {}", star)).text_style(TextStyle::Small).color(Color32::LIGHT_YELLOW));
+                    ui.label(RichText::new(format!("Rarity: {}", gen_star(data.max_rarity))).text_style(TextStyle::Small).color(Color32::LIGHT_YELLOW));
                   });
                 });
                 ui.label(data.two_piece_bonus);

@@ -4,6 +4,8 @@ use cached_network_image::{
 use egui_extras::RetainedImage;
 
 use crate::constants::{GENSHINDEV_URL, ARTIFACT_TYPE};
+use crate::theme::Icon;
+
 
 pub fn gen_image(url: String) -> Image {
     let uuid = ImageStore::<Image>::get_id(&url) //
@@ -42,4 +44,12 @@ pub fn gen_artifact_icon(name: &String) -> Vec<String> {
 pub fn gen_character_icon(name: &String) -> String {
     let name = trans_string(name);
     format!("{}/characters/{}/icon-big.webp", *GENSHINDEV_URL, name)
+}
+
+pub fn gen_star(rarity: u8) -> String {
+    let mut star = String::new();
+    for _ in 0..rarity {
+        star.push_str(Icon::STAR.icon);
+    }
+    star
 }
