@@ -4,19 +4,8 @@ use eframe::egui::{
 use cached_network_image::ImageCache;
 use crate::types::Character;
 use crate::util::{get_image, gen_star, show_vision};
+use crate::custom_grid;
 use super::TalentCard;
-
-macro_rules! character_grid {
-    ($ui:expr, $($label:expr),*) => {
-        egui::Grid::new("_properties").num_columns(2).min_col_width(120.0).max_col_width(120.0).show($ui, |ui|{
-            $(
-                ui.label($label.0);
-                ui.label($label.1);
-                ui.end_row();
-            )*
-        });
-    }
-}
 
 pub struct CharacterCard;
 
@@ -24,7 +13,7 @@ impl CharacterCard {
     pub fn show(ui: &mut Ui, data: Character, images: &ImageCache) {
         ui.vertical(|ui| {
             ui.horizontal(|ui| {
-                character_grid!(
+                custom_grid!(
                     ui,
                     ("Name", &data.name),
                     ("Title", &data.title),

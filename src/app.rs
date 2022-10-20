@@ -4,15 +4,15 @@ use anyhow::Result;
 use serde_json::Value;
 use tracing::{info};
 use egui_extras::RetainedImage;
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 use cached_network_image::{
     Image, ImageStore,
     FetchImage, FetchQueue, ImageCache,
 };
 use crate::api;
-use crate::types::{Category, Artifact, Character};
-use crate::widgets::{ArtifactCard, CharacterCard};
-use crate::util::{gen_image, gen_artifact_icon, gen_character_icon};
+use crate::types::{Category, Artifact, Character, Food};
+use crate::widgets::{ArtifactCard, CharacterCard, FoodCard};
+use crate::util::{gen_image, gen_artifact_icon, gen_icon_from_type, get_image};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
@@ -143,17 +143,33 @@ impl TemplateApp {
         match cate {
             "artifacts" => {
                 let mut data: Artifact = serde_json::from_value(data)?;
-                let imgs = gen_artifact_icon(&data.name);
+                let imgs = gen_artifact_icon(data.name.clone());
                 data.icon = imgs.clone();
                 self.add_images(imgs);
                 ArtifactCard::show(ui, data.clone(), &self.net_images);
             }
             "characters" => {
                 let mut data: Character = serde_json::from_value(data)?;
-                let img = gen_character_icon(&data.name);
+                // let img = gen_character_icon(&data.name);
+                let img = gen_icon_from_type(format!("characters/{}", data.name), "icon-big".into());
                 data.icon = img.clone();
                 self.add_image(img);
                 CharacterCard::show(ui, data.clone(), &self.net_images);
+            }
+            "consumables" => {
+                let data: HashMap<String, Food> = serde_json::from_value(data)?;
+                ui.with_layout(
+                    egui::Layout::left_to_right(egui::Align::Min)
+                        .with_main_wrap(true),
+                    |ui| {
+                        for (name, mut d) in data {
+                            let img = gen_icon_from_type("consumables/food".to_string(), name);
+                            d.icon = img.clone();
+                            self.add_image(img);
+                            FoodCard::show(ui, d.clone(), &self.net_images);
+                        }
+                    }
+                );
             }
             _ => {}                
         }
@@ -264,12 +280,10 @@ impl eframe::App for TemplateApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            self.style.for_scrollbar(ui);
             egui::ScrollArea::horizontal()
                 // .auto_shrink([false; 2])
                 .id_source("tabs")
                 .show(ui, |ui| {
-                    self.style.scrollarea(ui);
                     ui.horizontal(|ui| {
                         for tab in self.tabs.clone() {
                             let select = egui::SelectableLabel::new(
@@ -292,6 +306,7 @@ impl eframe::App for TemplateApp {
                 State::Idle => {
                     egui::ScrollArea::vertical()
                         // .auto_shrink([false; 2])
+                        // .enable_scrolling(false)
                         .id_source("content_scroll")
                         .show(ui, |ui| {
                             self.show_conent(ui).unwrap();

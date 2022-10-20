@@ -59,3 +59,31 @@ pub struct Talent {
     pub name: String,
     pub unlock: String,
 }
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Food {
+    pub description: String,
+    pub effect: String,
+    #[serde(rename = "hasRecipe")]
+    pub has_recipe: bool,
+    pub name: String,
+    #[serde(default = "default_usize")]
+    pub proficiency: u8,
+    pub rarity: u8,
+    #[serde(default = "default_recipe")]
+    pub recipe: Vec<Recipe>,
+    #[serde(rename = "type")]
+    pub food_type: String,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Recipe {
+    pub item: String,
+    pub quantity: u8,
+}
+
+fn default_recipe() -> Vec<Recipe> {
+    vec![]
+}
