@@ -14,6 +14,8 @@ use crate::widgets::{ArtifactCard};
 use crate::util::{gen_image, gen_artifact_icon};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
+const LOGO: &[u8] = include_bytes!("../assets/logo.png");
+
 enum Update {
     CategoriesLoaded(Result<Vec<Category>>),
     TabsLoaded(Result<Vec<String>>),
@@ -38,6 +40,7 @@ pub struct TemplateApp {
     fetch_queue: FetchQueue<Image>,
     net_images: ImageCache,
     style: Style,
+    logo: RetainedImage,
 }
 
 impl TemplateApp {
@@ -59,6 +62,7 @@ impl TemplateApp {
             fetch_queue: FetchQueue::create(cc.egui_ctx.clone()),
             net_images: ImageCache::default(),
             style: Style::default(),
+            logo: RetainedImage::from_image_bytes("logo", LOGO).unwrap(),
         };
 
         this.style.set_theme_visuals(&cc.egui_ctx);
@@ -206,18 +210,23 @@ impl eframe::App for TemplateApp {
             }
         }
 
-        egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            ui.heading("Category:");
-
+        egui::SidePanel::left("side_panel")
+        .resizable(false)
+        .min_width(150.0)
+        .show(ctx, |ui| {
+            self.logo.show_scaled(ui, 0.3);
+            ui.separator();
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
                     for cate in &self.categories.clone() {
+                        ui.style_mut().spacing.button_padding.y = 10.0;
                         let select = egui::SelectableLabel::new(
                             self.selected_category == cate.value, 
-                            egui::RichText::new(format!("{} {}", Icon::WEAPON.icon, &cate.name))
+                            egui::RichText::new(format!("{} {}", Icon::WEAPON.icon, &cate.name)).heading()
                         );
                         if ui.add(select).clicked() || self.selected_category.is_empty() {
                             self.selected_category = cate.value.clone();
+                            self.selected_tab = String::new();
                             self.load_tab_data(ctx, cate.value.clone());
                         }
                     }
