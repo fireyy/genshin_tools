@@ -1,5 +1,5 @@
 use eframe::egui::{
-    Ui, Frame, Layout, Direction, Align, vec2, Color32
+    Ui, Frame, Layout, Direction, Align, vec2, Color32, RichText, TextStyle
 };
 use cached_network_image::{
   ImageCache, ImageStore, Image
@@ -37,10 +37,11 @@ impl ArtifactCard {
                 ui.horizontal(|ui| {
                   ui.label(data.name);
                   ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    // ui.label(RichText::new(format!("Rarity: {}", data.max_rarity)).text_style(TextStyle::Small).color(ui.style().visuals.weak_text_color()));
+                    let mut star = String::new();
                     for _ in 0..data.max_rarity {
-                      Icon::STAR.size(12.0).color(Color32::YELLOW).show(ui);
+                      star.push_str(Icon::STAR.icon);
                     }
+                    ui.label(RichText::new(format!("Rarity: {}", star)).text_style(TextStyle::Small).color(Color32::LIGHT_YELLOW));
                   });
                 });
                 ui.label(data.two_piece_bonus);

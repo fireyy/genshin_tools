@@ -31,30 +31,7 @@ pub fn gen_artifact_icon(name: String) -> Vec<String> {
     arr
 }
 
-pub fn setup_custom_fonts(ctx: &egui::Context) {
-    let mut fonts = egui::FontDefinitions::default();
-    
-    fonts.font_data.insert(
-        "iconfont".to_owned(),
-        egui::FontData::from_static(ICON_FONT),
-    );
-
-    fonts.families.insert(
-        egui::FontFamily::Name("iconfont".into()),
-        vec!["Hack".to_owned(), "iconfont".into()],
-    );
-
-    fonts
-        .families
-        .get_mut(&egui::FontFamily::Proportional)
-        .unwrap()
-        .push("iconfont".to_owned());
-    
-    fonts
-        .families
-        .get_mut(&egui::FontFamily::Monospace)
-        .unwrap()
-        .push("iconfont".to_owned());
-
-    ctx.set_fonts(fonts);
+#[inline(always)]
+pub fn map_to_pixel(point: f32, ppi: f32, map: fn(f32) -> f32) -> f32 {
+    map(point * ppi) / ppi
 }

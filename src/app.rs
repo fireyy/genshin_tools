@@ -11,8 +11,8 @@ use cached_network_image::{
 use crate::api;
 use crate::types::{Category, Artifact, Character};
 use crate::widgets::{ArtifactCard};
-use crate::util::{gen_image, gen_artifact_icon, setup_custom_fonts};
-use crate::theme::Icon;
+use crate::util::{gen_image, gen_artifact_icon};
+use crate::theme::{Icon, setup_custom_fonts, Style};
 
 enum Update {
     CategoriesLoaded(Result<Vec<Category>>),
@@ -37,6 +37,7 @@ pub struct TemplateApp {
     data: Value,
     fetch_queue: FetchQueue<Image>,
     net_images: ImageCache,
+    style: Style,
 }
 
 impl TemplateApp {
@@ -57,7 +58,10 @@ impl TemplateApp {
             data: Value::Null,
             fetch_queue: FetchQueue::create(cc.egui_ctx.clone()),
             net_images: ImageCache::default(),
+            style: Style::default(),
         };
+
+        this.style.set_theme_visuals(&cc.egui_ctx);
 
         // load categories
         this.load_category(&cc.egui_ctx);
@@ -212,7 +216,7 @@ impl eframe::App for TemplateApp {
                             self.selected_category == cate.value, 
                             egui::RichText::new(format!("{} {}", Icon::WEAPON.icon, &cate.name))
                         );
-                        if ui.add(select).clicked() {
+                        if ui.add(select).clicked() || self.selected_category.is_empty() {
                             self.selected_category = cate.value.clone();
                             self.load_tab_data(ctx, cate.value.clone());
                         }
@@ -222,10 +226,12 @@ impl eframe::App for TemplateApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            self.style.for_scrollbar(ui);
             egui::ScrollArea::horizontal()
                 // .auto_shrink([false; 2])
                 .id_source("tabs")
                 .show(ui, |ui| {
+                    self.style.scrollarea(ui);
                     ui.horizontal(|ui| {
                         for tab in self.tabs.clone() {
                             let resp = ui.selectable_value(
@@ -233,7 +239,7 @@ impl eframe::App for TemplateApp {
                                 tab.clone(), 
                                 tab.clone()
                             );
-                            if resp.clicked() {
+                            if resp.clicked() || self.selected_tab.is_empty() {
                                 self.load_data(ctx, tab.clone());
                             }
                         }
