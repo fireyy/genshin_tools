@@ -9,7 +9,7 @@ fn main() {
 
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
-        "eframe template",
+        "genshin tools",
         native_options,
         Box::new(|cc| Box::new(genshin_tools::TemplateApp::new(cc))),
     );
