@@ -3,7 +3,7 @@ use eframe::egui::{
 };
 use cached_network_image::ImageCache;
 use crate::types::Character;
-use crate::util::{get_image, gen_star};
+use crate::util::{get_image, gen_star, show_vision};
 use super::TalentCard;
 
 macro_rules! character_grid {
@@ -31,7 +31,7 @@ impl CharacterCard {
                     ("Nation", &data.nation),
                     ("Birthday", &data.birthday),
                     ("Rarity", gen_star(data.rarity)),
-                    ("Vision", &data.vision),
+                    ("Vision", format!("{} {}", show_vision(&data.vision_key), &data.vision)),
                     ("Weapon", &data.weapon),
                     ("Affiliation", &data.affiliation),
                     ("Constellation", &data.constellation)

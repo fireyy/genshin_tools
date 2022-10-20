@@ -53,3 +53,18 @@ pub fn gen_star(rarity: u8) -> String {
     }
     star
 }
+
+pub fn show_vision(vision: &String) -> String {
+    let str = match vision.as_str() {
+        "ANEMO" => Icon::ANEMO.icon,
+        "CRYO" => Icon::CRYO.icon,
+        "DENDRO" => Icon::DENDRO.icon,
+        "ELECTRO" => Icon::ELECTRO.icon,
+        "GEO" => Icon::GEO.icon,
+        "HYDRO" => Icon::HYDRO.icon,
+        "PYRO" => Icon::PYRO.icon,
+        _ => Icon::AMBER.icon, // return Amber :p
+    };
+
+    str.to_string()
+}
