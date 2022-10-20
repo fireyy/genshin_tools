@@ -1,12 +1,16 @@
 fn default_string() -> String {
-    "-".to_string()
+    "".to_string()
 }
 
 fn default_usize() -> u8 {
     0
 }
 
-#[derive(Clone, Debug)]
+fn default_vec() -> Vec<String> {
+    vec![]
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Category {
     pub name: String,
     pub value: String,
@@ -20,6 +24,8 @@ pub struct Artifact {
     pub two_piece_bonus: String,
     #[serde(rename = "4-piece_bonus", default = "default_string")]
     pub four_piece_bonus: String,
+    #[serde(skip, default="default_vec")]
+    pub icon: Vec<String>,
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]
@@ -41,6 +47,8 @@ pub struct Character {
     pub vision_key: String,
     pub weapon: String,
     pub weapon_type: String,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]

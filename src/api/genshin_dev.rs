@@ -12,6 +12,7 @@ impl Api for GenshinDev {
 
     fn fetch(path: String) -> Result<Response> {
         let url  = Self::build_queue(path);
+        tracing::info!("Request url: {}", url);
         let res = get(url)?;
         Ok(res)
     }

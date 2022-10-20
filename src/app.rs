@@ -4,14 +4,15 @@ use anyhow::Result;
 use serde_json::Value;
 use tracing::{info};
 use egui_extras::RetainedImage;
+use std::collections::HashSet;
 use cached_network_image::{
     Image, ImageStore,
-    FetchImage, FetchQueue, ImageCache, ImageKind,
+    FetchImage, FetchQueue, ImageCache,
 };
 use crate::api;
 use crate::types::{Category, Artifact, Character};
-use crate::widgets::{ArtifactCard};
-use crate::util::{gen_image, gen_artifact_icon};
+use crate::widgets::{ArtifactCard, CharacterCard};
+use crate::util::{gen_image, gen_artifact_icon, gen_character_icon};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
@@ -39,12 +40,19 @@ pub struct TemplateApp {
     data: Value,
     fetch_queue: FetchQueue<Image>,
     net_images: ImageCache,
+    requested_images: HashSet<String>,
     style: Style,
     logo: RetainedImage,
 }
 
 impl TemplateApp {
+    const SAVE_KEY: &'static str = concat!(env!("CARGO_PKG_NAME"), "_", "categories");
+
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        let mut categories =  vec![];
+        if let Some(storage) = cc.storage {
+            categories = eframe::get_value(storage, Self::SAVE_KEY).unwrap_or_default();
+        }
         setup_custom_fonts(&cc.egui_ctx);
 
         let (update_tx, update_rx) = mpsc::channel();
@@ -54,21 +62,24 @@ impl TemplateApp {
             update_rx,
             state: State::Idle,
             load_err: None,
-            categories: vec![],
+            categories,
             selected_category: String::new(),
             tabs: vec![],
             selected_tab: String::new(),
             data: Value::Null,
             fetch_queue: FetchQueue::create(cc.egui_ctx.clone()),
             net_images: ImageCache::default(),
+            requested_images: HashSet::new(),
             style: Style::default(),
             logo: RetainedImage::from_image_bytes("logo", LOGO).unwrap(),
         };
 
         this.style.set_theme_visuals(&cc.egui_ctx);
 
-        // load categories
-        this.load_category(&cc.egui_ctx);
+        if this.categories.is_empty() {
+            // load categories
+            this.load_category(&cc.egui_ctx);
+        }
 
         this
     }
@@ -90,6 +101,8 @@ impl TemplateApp {
     fn load_tab_data(&mut self, ctx: &egui::Context, path: String) {
         self.state = State::Busy;
         self.selected_category = path.clone();
+        self.selected_tab = String::new();
+        self.tabs = vec![];
 
         let update_tx = self.update_tx.clone();
         let ctx = ctx.clone();
@@ -129,14 +142,18 @@ impl TemplateApp {
         
         match cate {
             "artifacts" => {
-                let data: Artifact = serde_json::from_value(data)?;
-                let imgs = gen_artifact_icon(data.name.clone());
+                let mut data: Artifact = serde_json::from_value(data)?;
+                let imgs = gen_artifact_icon(&data.name);
+                data.icon = imgs.clone();
                 self.add_images(imgs);
                 ArtifactCard::show(ui, data.clone(), &self.net_images);
             }
             "characters" => {
-                let data: Character = serde_json::from_value(data)?;
-                info!("Character data: {:?}", data);
+                let mut data: Character = serde_json::from_value(data)?;
+                let img = gen_character_icon(&data.name);
+                data.icon = img.clone();
+                self.add_image(img);
+                CharacterCard::show(ui, data.clone(), &self.net_images);
             }
             _ => {}                
         }
@@ -146,8 +163,15 @@ impl TemplateApp {
 
     fn add_images(&mut self, imgs: Vec<String>) {
         for img in imgs {
-            self.fetch_queue.fetch(gen_image(img, ImageKind::Display));
+            self.add_image(img);
         }
+    }
+
+    fn add_image(&mut self, img: String) {
+        if !self.requested_images.insert(img.clone()) {
+            return;
+        }
+        self.fetch_queue.fetch(gen_image(img));
     }
 
     fn try_fetch_image(&mut self) {
@@ -164,6 +188,7 @@ impl TemplateApp {
         match RetainedImage::from_image_bytes(image.url(), &data) {
           Ok(img) => {
             images.add(image.id, img);
+            let _ = self.requested_images.remove(&image.url);
             ImageStore::<Image>::add(&image, &(), &data);
           }
           Err(err) => {
@@ -174,6 +199,9 @@ impl TemplateApp {
 }
 
 impl eframe::App for TemplateApp {
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        eframe::set_value(storage, Self::SAVE_KEY, &self.categories);
+    }
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         while let Ok(update) = self.update_rx.try_recv() {
             match update {
@@ -224,11 +252,12 @@ impl eframe::App for TemplateApp {
                             self.selected_category == cate.value, 
                             egui::RichText::new(format!("{} {}", Icon::WEAPON.icon, &cate.name)).heading()
                         );
-                        if ui.add(select).clicked() || self.selected_category.is_empty() {
-                            self.selected_category = cate.value.clone();
-                            self.selected_tab = String::new();
+                        if ui.add(select).clicked() && self.selected_category != cate.value {
                             self.load_tab_data(ctx, cate.value.clone());
                         }
+                    }
+                    if self.selected_category.is_empty() && !self.categories.is_empty() {
+                        self.load_tab_data(ctx, self.categories.first().unwrap().value.clone());
                     }
                 });
             });
@@ -248,9 +277,12 @@ impl eframe::App for TemplateApp {
                                 tab.clone(), 
                                 tab.clone()
                             );
-                            if resp.clicked() || self.selected_tab.is_empty() {
+                            if resp.clicked() && self.selected_tab != tab {
                                 self.load_data(ctx, tab.clone());
                             }
+                        }
+                        if self.selected_tab.is_empty() && !self.tabs.is_empty() {
+                            self.load_data(ctx, self.tabs.first().unwrap().to_string());
                         }
                     });
                 });
