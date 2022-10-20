@@ -3,7 +3,7 @@ fn default_string() -> String {
 }
 
 fn default_usize() -> u8 {
-    0
+    1
 }
 
 fn default_vec() -> Vec<String> {

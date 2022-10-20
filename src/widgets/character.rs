@@ -1,10 +1,11 @@
 use eframe::egui::{
-    Ui, Frame, Layout, Direction, Align, vec2, Color32, RichText, TextStyle
+    Ui, Frame, vec2, Color32, Rounding, style::Margin,
 };
 use cached_network_image::ImageCache;
 use crate::types::Character;
 use crate::util::get_image;
 use crate::theme::Icon;
+use super::TalentCard;
 
 macro_rules! character_grid {
     ($ui:expr, $($label:expr),*) => {
@@ -22,29 +23,52 @@ pub struct CharacterCard;
 
 impl CharacterCard {
     pub fn show(ui: &mut Ui, data: Character, images: &ImageCache) {
-        ui.horizontal(|ui| {
-            character_grid!(
-                ui,
-                ("Name", &data.name),
-                ("Title", &data.title),
-                ("Nation", &data.nation),
-                ("Birthday", &data.birthday),
-                ("Rarity", format!("{}", data.rarity)),
-                ("Vision", &data.vision),
-                ("Weapon", &data.weapon),
-                ("Affiliation", &data.affiliation),
-                ("Constellation", &data.constellation)
-            );
-
-            Frame {
-                ..Frame::default()
-            }
-            .show(ui, |ui| {
-                ui.set_width(118.5);
-                ui.set_height(128.0);
-                if let Some(img) = get_image(images, data.icon) {
-                    let size = vec2(118.0, 128.0);
-                    img.show_size(ui, size);
+        ui.vertical(|ui| {
+            ui.horizontal(|ui| {
+                character_grid!(
+                    ui,
+                    ("Name", &data.name),
+                    ("Title", &data.title),
+                    ("Nation", &data.nation),
+                    ("Birthday", &data.birthday),
+                    ("Rarity", format!("{}", data.rarity)),
+                    ("Vision", &data.vision),
+                    ("Weapon", &data.weapon),
+                    ("Affiliation", &data.affiliation),
+                    ("Constellation", &data.constellation)
+                );
+    
+                ui.with_layout(egui::Layout::from_main_dir_and_cross_align(egui::Direction::TopDown, egui::Align::RIGHT), |ui| {
+                    Frame {
+                        ..Frame::default()
+                    }
+                    .show(ui, |ui| {
+                        ui.set_width(118.5);
+                        ui.set_height(128.0);
+                        if let Some(img) = get_image(images, data.icon) {
+                            let size = vec2(118.0, 128.0);
+                            img.show_size(ui, size);
+                        }
+                    });
+                });
+            });
+            ui.horizontal_wrapped(|ui| {
+                ui.label(&data.description);
+            });
+            // Talent
+            ui.collapsing("Constellations", |ui| {
+                for talent in data.constellations {
+                    TalentCard::show(ui, talent, images);
+                }
+            });
+            ui.collapsing("PassiveTalents", |ui| {
+                for talent in data.passive_talents {
+                    TalentCard::show(ui, talent, images);
+                }
+            });
+            ui.collapsing("skillTalents", |ui| {
+                for talent in data.skill_talents {
+                    TalentCard::show(ui, talent, images);
                 }
             });
         });

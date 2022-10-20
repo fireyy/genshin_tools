@@ -272,12 +272,11 @@ impl eframe::App for TemplateApp {
                     self.style.scrollarea(ui);
                     ui.horizontal(|ui| {
                         for tab in self.tabs.clone() {
-                            let resp = ui.selectable_value(
-                                &mut self.selected_tab, 
-                                tab.clone(), 
-                                tab.clone()
+                            let select = egui::SelectableLabel::new(
+                                self.selected_tab == tab,
+                                egui::RichText::new(&tab).heading()
                             );
-                            if resp.clicked() && self.selected_tab != tab {
+                            if ui.add(select).clicked() && self.selected_tab != tab {
                                 self.load_data(ctx, tab.clone());
                             }
                         }
@@ -291,7 +290,12 @@ impl eframe::App for TemplateApp {
 
             match &mut self.state {
                 State::Idle => {
-                    self.show_conent(ui).unwrap();
+                    egui::ScrollArea::vertical()
+                        // .auto_shrink([false; 2])
+                        .id_source("content_scroll")
+                        .show(ui, |ui| {
+                            self.show_conent(ui).unwrap();
+                        });
                 }
                 State::Busy => {
                     ui.centered_and_justified(|ui| {
