@@ -1,3 +1,6 @@
+use egui::{Color32, TextFormat, Align};
+use eframe::epaint::text::{LayoutJob, TextWrapping};
+
 mod icons;
 mod style;
 
@@ -25,4 +28,21 @@ pub fn setup_custom_fonts(ctx: &egui::Context) {
         .push("iconfont".to_owned());
 
     ctx.set_fonts(fonts);
+}
+
+pub fn text_ellipsis(name: &str, text_color: Color32, max_rows: usize) -> LayoutJob {
+    let mut job = LayoutJob::single_section(name.to_string(), TextFormat {
+        color: text_color,
+    
+        valign: Align::Center,
+        ..TextFormat::default()
+    });
+    
+    job.wrap = TextWrapping {
+        max_rows,
+        break_anywhere: true,
+        ..TextWrapping::default()
+    };
+    
+    job
 }

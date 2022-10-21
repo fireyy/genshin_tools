@@ -4,7 +4,7 @@ use anyhow::Result;
 use serde_json::Value;
 use tracing::{info};
 use egui_extras::RetainedImage;
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashSet, BTreeMap};
 use cached_network_image::{
     Image, ImageStore,
     FetchImage, FetchQueue, ImageCache,
@@ -12,7 +12,7 @@ use cached_network_image::{
 use crate::api;
 use crate::types::{Category, Artifact, Character, Food};
 use crate::widgets::{ArtifactCard, CharacterCard, FoodCard};
-use crate::util::{gen_image, gen_artifact_icon, gen_icon_from_type, get_image};
+use crate::util::{gen_image, gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
@@ -157,13 +157,14 @@ impl TemplateApp {
                 CharacterCard::show(ui, data.clone(), &self.net_images);
             }
             "consumables" => {
-                let data: HashMap<String, Food> = serde_json::from_value(data)?;
+                let data: BTreeMap<String, Food> = serde_json::from_value(data)?;       
                 ui.with_layout(
-                    egui::Layout::left_to_right(egui::Align::Min)
+                    egui::Layout::left_to_right(egui::Align::TOP)
                         .with_main_wrap(true),
                     |ui| {
+                        // ui.spacing_mut().item_spacing.x = 0.0;
                         for (name, mut d) in data {
-                            let img = gen_icon_from_type("consumables/food".to_string(), name);
+                            let img = gen_icon_from_type("consumables/food".to_string(), name.to_string());
                             d.icon = img.clone();
                             self.add_image(img);
                             FoodCard::show(ui, d.clone(), &self.net_images);
@@ -304,11 +305,13 @@ impl eframe::App for TemplateApp {
 
             match &mut self.state {
                 State::Idle => {
+                    self.style.for_scrollbar(ui);
                     egui::ScrollArea::vertical()
-                        // .auto_shrink([false; 2])
+                        .auto_shrink([false; 2])
                         // .enable_scrolling(false)
                         .id_source("content_scroll")
                         .show(ui, |ui| {
+                            self.style.scrollarea(ui);
                             self.show_conent(ui).unwrap();
                         });
                 }
