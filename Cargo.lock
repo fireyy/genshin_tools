@@ -178,6 +178,8 @@ checksum = "ec8a7b6a70fde80372154c65702f00a0f56f3e1c36abbc6c440484be248856db"
 [[package]]
 name = "cached_network_image"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7842c848a6226b29e76e28c30b86a2b3469128b77b86d1a33c9db5a26129fd0a"
 dependencies = [
  "anyhow",
  "egui",
