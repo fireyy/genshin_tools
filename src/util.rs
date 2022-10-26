@@ -1,30 +1,5 @@
-use cached_network_image::{
-    Image, ImageStore, ImageKind, Uuid, ImageCache,
-};
-use egui_extras::RetainedImage;
-
 use crate::constants::{GENSHINDEV_URL, ARTIFACT_TYPE};
 use crate::theme::Icon;
-
-
-pub fn gen_image(url: String) -> Image {
-    let uuid = ImageStore::<Image>::get_id(&url) //
-      .unwrap_or_else(Uuid::new_v4);
-    Image{
-      id: uuid,
-      kind: ImageKind::Display,
-      url: url.clone(),
-      meta: (),
-    }
-}
-
-pub fn get_image(images: &ImageCache, url: String) -> Option<&RetainedImage> {
-    if let Some(img_id) = ImageStore::<Image>::get_id(&url) {
-        images.get_id(img_id)
-    } else {
-        None
-    }
-}
 
 pub fn trans_string(name: String) -> String {
     name.to_lowercase()
