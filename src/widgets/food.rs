@@ -1,15 +1,15 @@
 use eframe::egui::{
     Ui, Frame, Color32
 };
-use cached_network_image::ImageCache;
+use crate::images::NetworkImages;
 use crate::types::Food;
-use crate::util::{get_image, gen_star};
+use crate::util::gen_star;
 use crate::theme::text_ellipsis;
 
 pub struct FoodCard;
 
 impl FoodCard {
-    pub fn show(ui: &mut Ui, data: Food, images: &ImageCache) {
+    pub fn show(ui: &mut Ui, data: Food, images: &NetworkImages) {
         let initial_size = egui::vec2(
             100.0,
             150.0, // Assume there will be
@@ -32,7 +32,7 @@ impl FoodCard {
                         .show(ui, |ui| {
                             ui.set_width(64.0);
                             ui.set_height(64.0);
-                            if let Some(img) = get_image(images, data.icon) {
+                            if let Some(img) = images.get_image(data.icon) {
                                 let size = egui::vec2(64.0, 64.0);
                                 img.show_size(ui, size);
                             }

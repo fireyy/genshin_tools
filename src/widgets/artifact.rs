@@ -1,14 +1,14 @@
 use eframe::egui::{
     Ui, Frame, Layout, Direction, Align, vec2, Color32, RichText, TextStyle
 };
-use cached_network_image::ImageCache;
+use crate::images::NetworkImages;
 use crate::types::Artifact;
-use crate::util::{get_image, gen_star};
+use crate::util::{gen_star};
 
 pub struct ArtifactCard;
 
 impl ArtifactCard {
-    pub fn show(ui: &mut Ui, data: Artifact, images: &ImageCache) {
+    pub fn show(ui: &mut Ui, data: Artifact, images: &NetworkImages) {
         ui.vertical(|ui| {
             ui.set_width(ui.available_width());
             ui.horizontal(|ui| {
@@ -19,7 +19,7 @@ impl ArtifactCard {
                 .show(ui, |ui| {
                   ui.set_width(64.0);
                   ui.set_height(64.0);
-                  if let Some(img) = get_image(images, img) {
+                  if let Some(img) = images.get_image(img) {
                     let size = vec2(64.0, 64.0);
                     img.show_size(ui, size);
                   }

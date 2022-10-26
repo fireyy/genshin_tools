@@ -1,13 +1,13 @@
 use eframe::egui::{
     Ui, Frame, Color32, Rounding, style::Margin,
 };
-use cached_network_image::ImageCache;
+use crate::images::NetworkImages;
 use crate::types::Talent;
 
 pub struct TalentCard;
 
 impl TalentCard {
-    pub fn show(ui: &mut Ui, data: Talent, _images: &ImageCache) {
+    pub fn show(ui: &mut Ui, data: Talent, _images: &NetworkImages) {
         Frame {
             rounding: Rounding::same(10.0),
             inner_margin: Margin::same(10.0),

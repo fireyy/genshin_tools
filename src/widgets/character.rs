@@ -1,16 +1,16 @@
 use eframe::egui::{
     Ui, Frame, vec2,
 };
-use cached_network_image::ImageCache;
+use crate::images::NetworkImages;
 use crate::types::Character;
-use crate::util::{get_image, gen_star, show_vision};
+use crate::util::{gen_star, show_vision};
 use crate::custom_grid;
 use super::TalentCard;
 
 pub struct CharacterCard;
 
 impl CharacterCard {
-    pub fn show(ui: &mut Ui, data: Character, images: &ImageCache) {
+    pub fn show(ui: &mut Ui, data: Character, images: &NetworkImages) {
         ui.vertical(|ui| {
             ui.horizontal(|ui| {
                 custom_grid!(
@@ -33,7 +33,7 @@ impl CharacterCard {
                     .show(ui, |ui| {
                         ui.set_width(118.5);
                         ui.set_height(128.0);
-                        if let Some(img) = get_image(images, data.icon) {
+                        if let Some(img) = images.get_image(data.icon) {
                             let size = vec2(118.0, 128.0);
                             img.show_size(ui, size);
                         }

@@ -7,4 +7,5 @@ mod widgets;
 mod util;
 mod constants;
 mod theme;
+mod images;
 pub use app::TemplateApp;

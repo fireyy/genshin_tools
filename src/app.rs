@@ -4,15 +4,12 @@ use anyhow::Result;
 use serde_json::Value;
 use tracing::{info};
 use egui_extras::RetainedImage;
-use std::collections::{HashSet, BTreeMap};
-use cached_network_image::{
-    Image, ImageStore,
-    FetchImage, FetchQueue, ImageCache,
-};
+use std::collections::BTreeMap;
+use crate::images::NetworkImages;
 use crate::api;
 use crate::types::{Category, Artifact, Character, Food};
 use crate::widgets::{ArtifactCard, CharacterCard, FoodCard};
-use crate::util::{gen_image, gen_artifact_icon, gen_icon_from_type};
+use crate::util::{gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
@@ -38,9 +35,7 @@ pub struct TemplateApp {
     tabs: Vec<String>,
     selected_tab: String,
     data: Value,
-    fetch_queue: FetchQueue<Image>,
-    net_images: ImageCache,
-    requested_images: HashSet<String>,
+    net_images: NetworkImages,
     style: Style,
     logo: RetainedImage,
 }
@@ -67,9 +62,7 @@ impl TemplateApp {
             tabs: vec![],
             selected_tab: String::new(),
             data: Value::Null,
-            fetch_queue: FetchQueue::create(cc.egui_ctx.clone()),
-            net_images: ImageCache::default(),
-            requested_images: HashSet::new(),
+            net_images: NetworkImages::new(cc.egui_ctx.clone()),
             style: Style::default(),
             logo: RetainedImage::from_image_bytes("logo", LOGO).unwrap(),
         };
@@ -145,7 +138,7 @@ impl TemplateApp {
                 let mut data: Artifact = serde_json::from_value(data)?;
                 let imgs = gen_artifact_icon(data.name.clone());
                 data.icon = imgs.clone();
-                self.add_images(imgs);
+                self.net_images.add_all(imgs);
                 ArtifactCard::show(ui, data.clone(), &self.net_images);
             }
             "characters" => {
@@ -153,7 +146,7 @@ impl TemplateApp {
                 // let img = gen_character_icon(&data.name);
                 let img = gen_icon_from_type(format!("characters/{}", data.name), "icon-big".into());
                 data.icon = img.clone();
-                self.add_image(img);
+                self.net_images.add(img);
                 CharacterCard::show(ui, data.clone(), &self.net_images);
             }
             "consumables" => {
@@ -166,7 +159,7 @@ impl TemplateApp {
                         for (name, mut d) in data {
                             let img = gen_icon_from_type("consumables/food".to_string(), name.to_string());
                             d.icon = img.clone();
-                            self.add_image(img);
+                            self.net_images.add(img);
                             FoodCard::show(ui, d.clone(), &self.net_images);
                         }
                     }
@@ -177,42 +170,6 @@ impl TemplateApp {
 
         Ok(())
     }
-
-    fn add_images(&mut self, imgs: Vec<String>) {
-        for img in imgs {
-            self.add_image(img);
-        }
-    }
-
-    fn add_image(&mut self, img: String) {
-        if !self.requested_images.insert(img.clone()) {
-            return;
-        }
-        self.fetch_queue.fetch(gen_image(img));
-    }
-
-    fn try_fetch_image(&mut self) {
-        let (image, data) = match self.fetch_queue.try_next() {
-          Some((image, data)) => (image, data),
-          _ => return,
-        };
-    
-        let images = &mut self.net_images;
-        if images.has_id(image.id) {
-          return;
-        }
-    
-        match RetainedImage::from_image_bytes(image.url(), &data) {
-          Ok(img) => {
-            images.add(image.id, img);
-            let _ = self.requested_images.remove(&image.url);
-            ImageStore::<Image>::add(&image, &(), &data);
-          }
-          Err(err) => {
-            tracing::error!("cannot create ({}) {} : {err}", image.id, image.url())
-          }
-        }
-      }
 }
 
 impl eframe::App for TemplateApp {
@@ -323,6 +280,6 @@ impl eframe::App for TemplateApp {
             }
         });
 
-        self.try_fetch_image();
+        self.net_images.try_fetch();
     }
 }
