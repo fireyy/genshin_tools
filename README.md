@@ -5,9 +5,7 @@
 
 This is a tool for [Genshin](https://genshin.mihoyo.com), using [egui](https://github.com/emilk/egui/).
 
-The goal is for this to be the simplest way to get started writing a GUI app in Rust.
-
-You can compile your app natively or for the web, and share it using Github Pages.
+![ScreenShot](./assets/screenshot.png)
 
 ## Getting started
 
