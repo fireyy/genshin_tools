@@ -1,5 +1,3 @@
-use reqwest::blocking::{get, Response};
-use anyhow::Result;
 use super::Api;
 use crate::constants::GENSHINDEV_URL;
 
@@ -10,10 +8,15 @@ impl Api for GenshinDev {
         format!("{}/{}", *GENSHINDEV_URL, path)
     }
 
-    fn fetch(path: String) -> Result<Response> {
+    fn fetch(path: String, callback: impl 'static + Send + FnOnce(ehttp::Response)) {
         let url  = Self::build_queue(path);
         tracing::info!("Request url: {}", url);
-        let res = get(url)?;
-        Ok(res)
+        let req = ehttp::Request::get(url);
+        ehttp::fetch(req, move |response| {
+            match response {
+                Ok(res) => callback(res),
+                Err(err) => tracing::error!("Request error: {}", err)
+            }
+        });
     }
 }
