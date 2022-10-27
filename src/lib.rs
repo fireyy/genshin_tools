@@ -8,5 +8,4 @@ mod util;
 mod constants;
 mod theme;
 mod images;
-mod future;
 pub use app::TemplateApp;

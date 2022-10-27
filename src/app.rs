@@ -10,7 +10,6 @@ use crate::types::{Category, Artifact, Character, Food};
 use crate::widgets::{ArtifactCard, CharacterCard, FoodCard};
 use crate::util::{gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
-use crate::future::spawn;
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
 
@@ -84,11 +83,9 @@ impl TemplateApp {
         let update_tx = self.update_tx.clone();
         let ctx = ctx.clone();
 
-        spawn(move || {
-            api::load_category(move |data| {
-                update_tx.send(Update::CategoriesLoaded(data)).unwrap();
-                ctx.request_repaint();
-            });
+        api::load_category(move |data| {
+            update_tx.send(Update::CategoriesLoaded(data)).unwrap();
+            ctx.request_repaint();
         });
     }
 
@@ -101,11 +98,9 @@ impl TemplateApp {
         let update_tx = self.update_tx.clone();
         let ctx = ctx.clone();
 
-        spawn(move || {
-            api::load_tab_data(path, move |data| {
-                update_tx.send(Update::TabsLoaded(data)).unwrap();
-                ctx.request_repaint();
-            });
+        api::load_tab_data(path, move |data| {
+            update_tx.send(Update::TabsLoaded(data)).unwrap();
+            ctx.request_repaint();
         });
     }
 
@@ -117,11 +112,9 @@ impl TemplateApp {
         let ctx = ctx.clone();
         let path = format!("{}/{}", self.selected_category, path);
 
-        spawn(move || {
-            api::load_data(path, move |data| {
-                update_tx.send(Update::DataLoaded(data)).unwrap();
-                ctx.request_repaint();
-            });
+        api::load_data(path, move |data| {
+            update_tx.send(Update::DataLoaded(data)).unwrap();
+            ctx.request_repaint();
         });
     }
 
