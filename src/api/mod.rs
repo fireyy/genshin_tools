@@ -14,51 +14,60 @@ struct LoadCategory {
 
 pub trait Api {
     fn build_queue(path: String) -> String;
-    fn fetch(path: String, callback: impl 'static + Send + FnOnce(ehttp::Response));
+    fn fetch(path: String, callback: impl 'static + Send + FnOnce(Result<ehttp::Response>));
 }
 
 pub fn load_category(callback: impl 'static + Send + FnOnce(Result<Vec<Category>>)) {
     let mut categories = vec![];
-    GenshinDev::fetch("".into(), |res| {
-        match res.text() {
-            Some(text) => {
-                let val: LoadCategory = serde_json::from_str(text).unwrap();
-                for d in val.types {
-                    categories.push(Category {
-                        name: d.clone(),
-                        value: d,
-                    });
+    GenshinDev::fetch("".into(), |result| {
+        match result {
+            Ok(res) => match res.text() {
+                Some(text) => {
+                    let val: LoadCategory = serde_json::from_str(text).unwrap();
+                    for d in val.types {
+                        categories.push(Category {
+                            name: d.clone(),
+                            value: d,
+                        });
+                    }
+    
+                    callback(Ok(categories))
                 }
-
-                callback(Ok(categories))
+                None => callback(Err(anyhow::Error::msg("No Response")))
             }
-            None => callback(Err(anyhow::Error::msg("No Response")))
+            Err(err) => callback(Err(err))
         }
     });
 }
 
 pub fn load_data(path: String, callback: impl 'static + Send + FnOnce(Result<Value>)) {
-    GenshinDev::fetch(format!("{path}"), |res| {
-        match res.text() {
-            Some(text) => {
-                let val: Value = serde_json::from_str(text).unwrap();
-
-                callback(Ok(val))
+    GenshinDev::fetch(format!("{path}"), |result| {
+        match result {
+            Ok(res) => match res.text() {
+                Some(text) => {
+                    let val: Value = serde_json::from_str(text).unwrap();
+    
+                    callback(Ok(val))
+                }
+                None => callback(Err(anyhow::Error::msg("No Response")))
             }
-            None => callback(Err(anyhow::Error::msg("No Response")))
+            Err(err) => callback(Err(err))
         }
     });
 }
 
 pub fn load_tab_data(path: String, callback: impl 'static + Send + FnOnce(Result<Vec<String>>)) {
-    GenshinDev::fetch(format!("{path}"), |res| {
-        match res.text() {
-            Some(text) => {
-                let val: Vec<String> = serde_json::from_str(text).unwrap();
-
-                callback(Ok(val))
+    GenshinDev::fetch(format!("{path}"), |result| {
+        match result {
+            Ok(res) => match res.text() {
+                Some(text) => {
+                    let val: Vec<String> = serde_json::from_str(text).unwrap();
+    
+                    callback(Ok(val))
+                }
+                None => callback(Err(anyhow::Error::msg("No Response")))
             }
-            None => callback(Err(anyhow::Error::msg("No Response")))
+            Err(err) => callback(Err(err))
         }
     });
 }
