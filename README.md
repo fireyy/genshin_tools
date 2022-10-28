@@ -11,6 +11,18 @@ Use data from [genshin.dev API](https://api.genshin.dev/), a fan-made Genshin Im
 
 👉 [Click to run the web demo](https://fireyy.github.io/genshin_tools/) 👈
 
+## TODO List
+- [x] artifacts
+- [] boss
+- [x] characters
+- [x] consumables
+- [x] domains
+- [x] elements
+- [x] enemies
+- [] materials
+- [] nations
+- [] weapons
+
 ## Getting started
 
 `cargo run`
