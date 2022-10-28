@@ -200,7 +200,11 @@ impl TemplateApp {
                 self.net_images.add(img);
                 EnemyCard::show(ui, data.clone(), &self.net_images);
             }
-            _ => {}                
+            _ => {
+                ui.centered_and_justified(|ui| {
+                    ui.heading("Coming Soon...");
+                });
+            }
         }
 
         Ok(())
