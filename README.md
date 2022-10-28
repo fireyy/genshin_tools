@@ -13,15 +13,15 @@ Use data from [genshin.dev API](https://api.genshin.dev/), a fan-made Genshin Im
 
 ## TODO List
 - [x] artifacts
-- [] boss
+- [ ] boss
 - [x] characters
 - [x] consumables
 - [x] domains
 - [x] elements
 - [x] enemies
-- [] materials
-- [] nations
-- [] weapons
+- [ ] materials
+- [ ] nations
+- [ ] weapons
 
 ## Getting started
 
