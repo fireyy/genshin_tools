@@ -6,8 +6,8 @@ use egui_extras::RetainedImage;
 use std::collections::BTreeMap;
 use crate::images::NetworkImages;
 use crate::api;
-use crate::types::{Category, Artifact, Character, Food, Potion, Domain, Element};
-use crate::widgets::{ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard, ElementCard};
+use crate::types::{Category, ArtifactSet, Character, Food, Potion, Domain, Element, Enemy};
+use crate::widgets::{ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard, ElementCard, EnemyCard};
 use crate::util::{gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
@@ -131,7 +131,7 @@ impl TemplateApp {
         
         match cate {
             "artifacts" => {
-                let mut data: Artifact = serde_json::from_value(data)?;
+                let mut data: ArtifactSet = serde_json::from_value(data)?;
                 let imgs = gen_artifact_icon(data.name.clone());
                 data.icon = imgs.clone();
                 self.net_images.add_all(imgs);
@@ -192,6 +192,13 @@ impl TemplateApp {
                 data.icon = img.clone();
                 self.net_images.add(img);
                 ElementCard::show(ui, data.clone(), &self.net_images);
+            }
+            "enemies" => {
+                let mut data: Enemy = serde_json::from_value(data)?;
+                let img = gen_icon_from_type(format!("enemies/{}", data.name), "icon".into());
+                data.icon = img.clone();
+                self.net_images.add(img);
+                EnemyCard::show(ui, data.clone(), &self.net_images);
             }
             _ => {}                
         }

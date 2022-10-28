@@ -3,7 +3,7 @@ fn default_string() -> String {
 }
 
 fn default_usize() -> u8 {
-    1
+    0
 }
 
 fn default_vec() -> Vec<String> {
@@ -17,7 +17,7 @@ pub struct Category {
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]
-pub struct Artifact {
+pub struct ArtifactSet {
     pub name: String,
     pub max_rarity: u8,
     #[serde(rename = "2-piece_bonus", default = "default_string")]
@@ -26,6 +26,15 @@ pub struct Artifact {
     pub four_piece_bonus: String,
     #[serde(skip, default="default_vec")]
     pub icon: Vec<String>,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Artifact {
+    pub name: String,
+    pub rarity: String,
+    pub set: String,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]
@@ -170,4 +179,52 @@ pub struct Reaction {
     pub description: String,
     pub name: String,
     pub elements: Vec<String>,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Enemy {
+    #[serde(default="default_artifact")]
+    pub artifacts: Vec<Artifact>,
+    pub description: String,
+    #[serde(default="default_enemy_drop")]
+    pub drops: Vec<EnemyDrop>,
+    #[serde(rename = "elemental-description", default="default_elemental_description")]
+    pub elemental_description: Vec<ElementalDescription>,
+    pub elements: Vec<String>,
+    #[serde(default="default_string")]
+    pub faction: String,
+    pub family: String,
+    pub id: String,
+    #[serde(rename = "mora-gained", default="default_usize")]
+    pub mora_gained: u8,
+    pub name: String,
+    pub region: String,
+    #[serde(rename = "type")]
+    pub enemy_type: String,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
+}
+
+fn default_artifact() -> Vec<Artifact> {
+    vec![]
+}
+fn default_enemy_drop() -> Vec<EnemyDrop> {
+    vec![]
+}
+fn default_elemental_description() -> Vec<ElementalDescription> {
+    vec![]
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct EnemyDrop {
+    #[serde(rename = "minimum-level")]
+    pub minimum_level: u8,
+    pub rarity: u8,
+    pub name: String,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct ElementalDescription {
+    pub description: String,
+    pub element: String,
 }

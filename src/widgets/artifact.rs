@@ -2,13 +2,13 @@ use eframe::egui::{
     Ui, Frame, Layout, Direction, Align, vec2, Color32, RichText, TextStyle
 };
 use crate::images::NetworkImages;
-use crate::types::Artifact;
+use crate::types::ArtifactSet;
 use crate::util::{gen_star};
 
 pub struct ArtifactCard;
 
 impl ArtifactCard {
-    pub fn show(ui: &mut Ui, data: Artifact, images: &NetworkImages) {
+    pub fn show(ui: &mut Ui, data: ArtifactSet, images: &NetworkImages) {
         ui.vertical(|ui| {
             ui.set_width(ui.available_width());
             ui.horizontal(|ui| {
