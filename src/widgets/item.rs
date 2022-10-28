@@ -43,3 +43,24 @@ pub fn item_ui(ui: &mut egui::Ui, icon: String, name: String, rarity: u8, images
 pub fn item(icon: String, name: String, rarity: u8, images: &NetworkImages) -> impl egui::Widget + '_ {
     move |ui: &mut egui::Ui| item_ui(ui, icon, name, rarity, images)
 }
+
+#[macro_export]
+macro_rules! custom_list {
+    ($ui:expr, $($label:expr),*) => {
+        egui::Frame {
+            rounding: egui::Rounding::same(10.0),
+            inner_margin: egui::style::Margin::same(10.0),
+            fill: egui::Color32::from_gray(50),
+            ..egui::Frame::default()
+        }.show($ui, |ui| {
+            ui.vertical(|ui| {
+                $(
+                    ui.horizontal(|ui| {
+                        ui.label($label.0);
+                        ui.label($label.1);
+                    });
+                )*
+            })
+        });
+    }
+}

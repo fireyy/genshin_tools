@@ -6,8 +6,8 @@ use egui_extras::RetainedImage;
 use std::collections::BTreeMap;
 use crate::images::NetworkImages;
 use crate::api;
-use crate::types::{Category, Artifact, Character, Food, Potion};
-use crate::widgets::{ArtifactCard, CharacterCard, FoodCard, PotionCard};
+use crate::types::{Category, Artifact, Character, Food, Potion, Domain};
+use crate::widgets::{ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard};
 use crate::util::{gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
@@ -181,7 +181,10 @@ impl TemplateApp {
                     }
                     _ => {}
                 }
-                
+            }
+            "domains" => {
+                let data: Domain = serde_json::from_value(data)?;
+                DomainCard::show(ui, data.clone());
             }
             _ => {}                
         }

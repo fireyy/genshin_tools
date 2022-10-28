@@ -97,3 +97,61 @@ pub struct Potion {
     #[serde(skip, default="default_string")]
     pub icon: String,
 }
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Domain {
+    pub description: String,
+    pub location: String,
+    pub name: String,
+    pub nation: String,
+    #[serde(rename = "recommendedElements")]
+    pub recommended_elements: Vec<String>,
+    pub requirements: Vec<Requirement>,
+    pub rewards: Vec<Reward>,
+    #[serde(rename = "type")]
+    pub domain_type: String,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Requirement {
+    #[serde(rename = "adventureRank")]
+    pub adventure_rank: u8,
+    pub level: u8,
+    #[serde(rename = "leyLineDisorder")]
+    pub ley_line_disorder: Vec<String>,
+    #[serde(rename = "recommendedLevel")]
+    pub recommended_level: u8
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Reward {
+    pub day: String,
+    pub details: Vec<RewardDetail>,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct RewardDetail {
+    #[serde(rename = "adventureExperience")]
+    pub adventure_experience: u8,
+    #[serde(rename = "companionshipExperience")]
+    pub companionship_experience: u8,
+    #[serde(default = "default_drop")]
+    pub drops: Vec<Drop>,
+    #[serde(default = "default_drop")]
+    pub items: Vec<Drop>,
+    pub level: u8,
+    pub mora: u16,
+}
+
+fn default_drop() -> Vec<Drop> {
+    vec![]
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Drop {
+    pub drop_max: u8,
+    pub drop_min: u8,
+    pub name: String,
+}

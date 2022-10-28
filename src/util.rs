@@ -31,7 +31,7 @@ pub fn gen_star(rarity: u8) -> String {
 }
 
 pub fn show_vision(vision: &String) -> String {
-    let str = match vision.as_str() {
+    let str = match vision.to_uppercase().as_str() {
         "ANEMO" => Icon::ANEMO.icon,
         "CRYO" => Icon::CRYO.icon,
         "DENDRO" => Icon::DENDRO.icon,
