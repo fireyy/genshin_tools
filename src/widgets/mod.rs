@@ -5,6 +5,7 @@ mod food;
 mod item;
 mod potion;
 mod domain;
+mod element;
 
 pub use artifact::ArtifactCard;
 pub use character::CharacterCard;
@@ -13,3 +14,4 @@ pub use food::FoodCard;
 pub use item::item;
 pub use potion::PotionCard;
 pub use domain::DomainCard;
+pub use element::ElementCard;

@@ -155,3 +155,19 @@ pub struct Drop {
     pub drop_min: u8,
     pub name: String,
 }
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Element {
+    pub key: String,
+    pub name: String,
+    pub reactions: Vec<Reaction>,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
+}
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Reaction {
+    pub description: String,
+    pub name: String,
+    pub elements: Vec<String>,
+}
