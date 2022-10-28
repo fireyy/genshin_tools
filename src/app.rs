@@ -6,8 +6,8 @@ use egui_extras::RetainedImage;
 use std::collections::BTreeMap;
 use crate::images::NetworkImages;
 use crate::api;
-use crate::types::{Category, Artifact, Character, Food};
-use crate::widgets::{ArtifactCard, CharacterCard, FoodCard};
+use crate::types::{Category, Artifact, Character, Food, Potion};
+use crate::widgets::{ArtifactCard, CharacterCard, FoodCard, PotionCard};
 use crate::util::{gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
@@ -146,20 +146,42 @@ impl TemplateApp {
                 CharacterCard::show(ui, data.clone(), &self.net_images);
             }
             "consumables" => {
-                let data: BTreeMap<String, Food> = serde_json::from_value(data)?;       
-                ui.with_layout(
-                    egui::Layout::left_to_right(egui::Align::TOP)
-                        .with_main_wrap(true),
-                    |ui| {
-                        // ui.spacing_mut().item_spacing.x = 0.0;
-                        for (name, mut d) in data {
-                            let img = gen_icon_from_type("consumables/food".to_string(), name.to_string());
-                            d.icon = img.clone();
-                            self.net_images.add(img);
-                            FoodCard::show(ui, d.clone(), &self.net_images);
-                        }
+                let tab = self.selected_tab.as_str();
+                match tab {
+                    "food" => {
+                        let data: BTreeMap<String, Food> = serde_json::from_value(data)?;
+                        ui.with_layout(
+                            egui::Layout::left_to_right(egui::Align::TOP)
+                                .with_main_wrap(true),
+                            |ui| {
+                                // ui.spacing_mut().item_spacing.x = 0.0;
+                                for (name, mut d) in data {
+                                    let img = gen_icon_from_type("consumables/food".to_string(), name.to_string());
+                                    d.icon = img.clone();
+                                    self.net_images.add(img);
+                                    FoodCard::show(ui, d.clone(), &self.net_images);
+                                }
+                            }
+                        );
                     }
-                );
+                    "potions" => {
+                        let data: BTreeMap<String, Potion> = serde_json::from_value(data)?;
+                        ui.with_layout(
+                            egui::Layout::left_to_right(egui::Align::TOP)
+                                .with_main_wrap(true),
+                            |ui| {
+                                for (name, mut d) in data {
+                                    let img = gen_icon_from_type("consumables/potions".to_string(), name.to_string());
+                                    d.icon = img.clone();
+                                    self.net_images.add(img);
+                                    PotionCard::show(ui, d.clone(), &self.net_images);
+                                }
+                            }
+                        );
+                    }
+                    _ => {}
+                }
+                
             }
             _ => {}                
         }

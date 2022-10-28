@@ -87,3 +87,13 @@ pub struct Recipe {
 fn default_recipe() -> Vec<Recipe> {
     vec![]
 }
+
+#[derive(Clone, serde::Deserialize, Debug)]
+pub struct Potion {
+    pub effect: String,
+    pub name: String,
+    pub rarity: u8,
+    pub crafting: Vec<Recipe>,
+    #[serde(skip, default="default_string")]
+    pub icon: String,
+}

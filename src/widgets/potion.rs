@@ -1,19 +1,17 @@
 use crate::images::NetworkImages;
-use crate::types::Food;
+use crate::types::Potion;
 use super::item;
 
-pub struct FoodCard;
+pub struct PotionCard;
 
-impl FoodCard {
-    pub fn show(ui: &mut egui::Ui, data: Food, images: &NetworkImages) {
+impl PotionCard {
+    pub fn show(ui: &mut egui::Ui, data: Potion, images: &NetworkImages) {
         let response = ui.add(item(data.icon, data.name, data.rarity, images));
         response.on_hover_ui(|ui| {
-            ui.label(data.food_type);
             ui.label(data.effect);
-            for recipe in data.recipe {
+            for recipe in data.crafting {
                 ui.label(format!("{} x {}", recipe.item, recipe.quantity));
             }
-            ui.label(data.description);
         });
     }
 }
