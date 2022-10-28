@@ -5,7 +5,13 @@
 
 This is a tool for [Genshin](https://genshin.mihoyo.com), using [egui](https://github.com/emilk/egui/).
 
+Use data from [genshin.dev API](https://api.genshin.dev/), a fan-made Genshin Impact API for easy access to game data.
+
 ![ScreenShot](./assets/screenshot.png)
+
+[genshin.dev API](https://api.genshin.dev/)
+
+👉 [Click to run the web demo](https://fireyy.github.io/genshin_tools/) 👈
 
 ## Getting started
 
