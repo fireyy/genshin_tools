@@ -7,6 +7,7 @@ mod potion;
 mod domain;
 mod element;
 mod enemy;
+mod tabs;
 
 pub use artifact::ArtifactCard;
 pub use character::CharacterCard;
@@ -17,3 +18,4 @@ pub use potion::PotionCard;
 pub use domain::DomainCard;
 pub use element::ElementCard;
 pub use enemy::EnemyCard;
+pub use tabs::tab_ui;

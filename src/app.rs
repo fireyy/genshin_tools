@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use crate::images::NetworkImages;
 use crate::api;
 use crate::types::{Category, ArtifactSet, Character, Food, Potion, Domain, Element, Enemy};
-use crate::widgets::{ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard, ElementCard, EnemyCard};
+use crate::widgets::{tab_ui, ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard, ElementCard, EnemyCard};
 use crate::util::{gen_artifact_icon, gen_icon_from_type};
 use crate::theme::{Icon, setup_custom_fonts, Style};
 
@@ -277,25 +277,9 @@ impl eframe::App for TemplateApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            egui::ScrollArea::horizontal()
-                // .auto_shrink([false; 2])
-                .id_source("tabs")
-                .show(ui, |ui| {
-                    ui.horizontal(|ui| {
-                        for tab in self.tabs.clone() {
-                            let select = egui::SelectableLabel::new(
-                                self.selected_tab == tab,
-                                egui::RichText::new(&tab).heading()
-                            );
-                            if ui.add(select).clicked() && self.selected_tab != tab {
-                                self.load_data(ctx, tab.clone());
-                            }
-                        }
-                        if self.selected_tab.is_empty() && !self.tabs.is_empty() {
-                            self.load_data(ctx, self.tabs.first().unwrap().to_string());
-                        }
-                    });
-                });
+            tab_ui(ui, self.tabs.clone(), self.selected_tab.clone(), |a, b| {
+                self.load_data(a, b);
+            });
             
             ui.separator();
 
