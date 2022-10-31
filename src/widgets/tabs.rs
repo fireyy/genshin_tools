@@ -1,6 +1,8 @@
 use egui::{Ui, ScrollArea, SelectableLabel, RichText, Context, Align, Layout};
 
 pub fn tab_ui(ui: &mut Ui, data: Vec<String>, selected: String, mut handler: impl FnMut(&Context, String)) {
+    let id = egui::Id::new("scrolled_tab");
+    let scrolled_tab: String = ui.memory().data.get_temp(id).unwrap_or_default();
     ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
         ui.set_height(30.0);
         let max_width = ui.available_width() - 70.0;
@@ -28,7 +30,8 @@ pub fn tab_ui(ui: &mut Ui, data: Vec<String>, selected: String, mut handler: imp
                             RichText::new(&tab).heading()
                         );
                         let response = ui.add(select);
-                        if selected == tab {
+                        if selected == tab && scrolled_tab != tab {
+                            ui.memory().data.insert_temp(id, tab.clone());
                             response.scroll_to_me(Some(Align::Center));
                         }
                         if response.clicked() && selected != tab {
