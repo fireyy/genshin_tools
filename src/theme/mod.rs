@@ -41,6 +41,7 @@ pub fn text_ellipsis(name: &str, text_color: Color32, max_rows: usize) -> Layout
     job.wrap = TextWrapping {
         max_rows,
         break_anywhere: true,
+        overflow_character: Some('…'),
         ..TextWrapping::default()
     };
     
