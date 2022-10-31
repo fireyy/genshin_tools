@@ -42,6 +42,9 @@ impl Icon {
   pub const ARTIFACT: Self = ic("\u{e61a}");
   pub const ORE: Self = ic("\u{e61b}");
   pub const MATERIAL: Self = ic("\u{e61c}");
+  pub const CASTLE: Self = ic("\u{e863}");
+  pub const MONSTER: Self = ic("\u{e664}");
+  pub const COMPASS: Self = ic("\u{e629}");
 
   pub fn color(self, color: egui::Color32) -> Self {
     let mut this = self;

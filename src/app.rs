@@ -9,7 +9,7 @@ use crate::api;
 use crate::types::{Category, ArtifactSet, Character, Food, Potion, Domain, Element, Enemy};
 use crate::widgets::{tab_ui, ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard, ElementCard, EnemyCard};
 use crate::util::{gen_artifact_icon, gen_icon_from_type};
-use crate::theme::{Icon, setup_custom_fonts, Style};
+use crate::theme::{setup_custom_fonts, Style};
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
 
@@ -263,7 +263,7 @@ impl eframe::App for TemplateApp {
                         ui.style_mut().spacing.button_padding.y = 10.0;
                         let select = egui::SelectableLabel::new(
                             self.selected_category == cate.value, 
-                            egui::RichText::new(format!("{} {}", Icon::WEAPON.icon, &cate.name)).heading()
+                            egui::RichText::new(format!("{} {}", cate.clone().icon(), &cate.name)).heading()
                         );
                         if ui.add(select).clicked() && self.selected_category != cate.value {
                             self.load_tab_data(ctx, cate.value.clone());

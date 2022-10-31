@@ -1,3 +1,5 @@
+use crate::theme::Icon;
+
 fn default_string() -> String {
     "".to_string()
 }
@@ -14,6 +16,24 @@ fn default_vec() -> Vec<String> {
 pub struct Category {
     pub name: String,
     pub value: String,
+}
+
+impl Category {
+    pub fn icon(self) -> String {
+        match self.value.as_str() {
+            "artifacts" => Icon::ARTIFACT.icon,
+            "boss" => Icon::CIRCLE.icon,
+            "characters" => Icon::AMBER.icon,
+            "consumables" => Icon::ITEM.icon,
+            "domains" => Icon::CASTLE.icon,
+            "elements" => Icon::ANEMO.icon,
+            "enemies" => Icon::MONSTER.icon,
+            "materials" => Icon::MATERIAL.icon,
+            "nations" => Icon::COMPASS.icon,
+            "weapons" => Icon::WEAPON.icon,
+            _ => Icon::AMBER.icon,
+        }.to_string()
+    }
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]
