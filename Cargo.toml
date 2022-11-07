@@ -13,8 +13,7 @@ name = "GenshinTools"
 identifier = "com.fireyy.genshin_tools"
 icon = ["icons/Icon.icns", "icons/icon-win-256.png", "icons/icon-win-32.png", "icons/icon-win-16.png"]
 version = "1.0.0"
-copyright = "Copyright (c) fireyy (2021). All rights reserved."
-category = "Tool"
+copyright = "Copyright (c) fireyy (2022). All rights reserved."
 short_description = "This is a tool for Genshin Impact"
 osx_minimum_system_version = "10.12"
 
