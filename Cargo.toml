@@ -4,9 +4,19 @@ version = "0.1.0"
 authors = ["Fireyy Zhu <fireyy@gmail.com>"]
 edition = "2021"
 rust-version = "1.60"
+description = "This is a tool for Genshin Impact, using egui."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[package.metadata.bundle]
+name = "GenshinTools"
+identifier = "com.fireyy.genshin_tools"
+icon = ["icons/Icon.icns", "icons/icon-win-256.png", "icons/icon-win-32.png", "icons/icon-win-16.png"]
+version = "1.0.0"
+copyright = "Copyright (c) fireyy (2021). All rights reserved."
+category = "Tool"
+short_description = "This is a tool for Genshin Impact"
+osx_minimum_system_version = "10.12"
 
 [dependencies]
 egui = "0.19.0"
