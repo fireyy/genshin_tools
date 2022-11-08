@@ -32,7 +32,8 @@ image = { version = "0.24", default-features = false, features = ["png", "webp"]
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tracing-subscriber = "0.3"
-cached_network_image = "0.3"
+cached_network_image = "1.0"
+directories = "4.0"
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
