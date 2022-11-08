@@ -18,7 +18,8 @@ pub struct NetworkImages {
 #[cfg(not(target_arch = "wasm32"))]
 impl NetworkImages {
     pub fn new(ctx: egui::Context) -> Self {
-        let path = ProjectDirs::from("com", "fireyy", "Genshin Tools").map(|proj_dirs| proj_dirs.config_dir().to_path_buf());
+        let path = ProjectDirs::from("com", "fireyy", "Genshin Tools")
+            .map(|proj_dirs| proj_dirs.config_dir().to_path_buf());
         let image_store = ImageStore::<Image>::new(path);
         Self {
             image_store: image_store.clone(),
