@@ -1,6 +1,6 @@
 [package]
 name = "genshin_tools"
-version = "0.1.0"
+version = "0.3.0"
 authors = ["Fireyy Zhu <fireyy@gmail.com>"]
 edition = "2021"
 rust-version = "1.60"
