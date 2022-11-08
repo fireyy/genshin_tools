@@ -1,7 +1,4 @@
-on:
-  push:
-    branches:
-      - 'releases/**'
+on: [push, pull_request]
 
 name: CI
 
