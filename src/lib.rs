@@ -1,11 +1,11 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
-mod app;
 mod api;
-mod types;
-mod widgets;
-mod util;
+mod app;
 mod constants;
-mod theme;
 mod images;
+mod theme;
+mod types;
+mod util;
+mod widgets;
 pub use app::TemplateApp;

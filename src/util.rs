@@ -1,10 +1,8 @@
-use crate::constants::{GENSHINDEV_URL, ARTIFACT_TYPE};
+use crate::constants::{ARTIFACT_TYPE, GENSHINDEV_URL};
 use crate::theme::Icon;
 
 pub fn trans_string(name: String) -> String {
-    name.to_lowercase()
-        .replace(" ", "-")
-        .replace("'", "-")
+    name.to_lowercase().replace(" ", "-").replace("'", "-")
 }
 
 pub fn gen_artifact_icon(name: String) -> Vec<String> {

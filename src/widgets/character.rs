@@ -1,11 +1,9 @@
-use eframe::egui::{
-    Ui, Frame, vec2,
-};
+use super::TalentCard;
+use crate::custom_grid;
 use crate::images::NetworkImages;
 use crate::types::Character;
 use crate::util::{gen_star, show_vision};
-use crate::custom_grid;
-use super::TalentCard;
+use eframe::egui::{vec2, Frame, Ui};
 
 pub struct CharacterCard;
 
@@ -20,25 +18,31 @@ impl CharacterCard {
                     ("Nation", &data.nation),
                     ("Birthday", &data.birthday),
                     ("Rarity", gen_star(data.rarity)),
-                    ("Vision", format!("{} {}", show_vision(&data.vision_key), &data.vision)),
+                    (
+                        "Vision",
+                        format!("{} {}", show_vision(&data.vision_key), &data.vision)
+                    ),
                     ("Weapon", &data.weapon),
                     ("Affiliation", &data.affiliation),
                     ("Constellation", &data.constellation)
                 );
-    
-                ui.with_layout(egui::Layout::from_main_dir_and_cross_align(egui::Direction::TopDown, egui::Align::RIGHT), |ui| {
-                    Frame {
-                        ..Frame::default()
-                    }
-                    .show(ui, |ui| {
-                        ui.set_width(118.5);
-                        ui.set_height(128.0);
-                        if let Some(img) = images.get_image(data.icon) {
-                            let size = vec2(118.0, 128.0);
-                            img.show_size(ui, size);
-                        }
-                    });
-                });
+
+                ui.with_layout(
+                    egui::Layout::from_main_dir_and_cross_align(
+                        egui::Direction::TopDown,
+                        egui::Align::RIGHT,
+                    ),
+                    |ui| {
+                        Frame { ..Frame::default() }.show(ui, |ui| {
+                            ui.set_width(118.5);
+                            ui.set_height(128.0);
+                            if let Some(img) = images.get_image(data.icon) {
+                                let size = vec2(118.0, 128.0);
+                                img.show_size(ui, size);
+                            }
+                        });
+                    },
+                );
             });
             ui.horizontal_wrapped(|ui| {
                 ui.label(&data.description);

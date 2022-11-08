@@ -1,6 +1,11 @@
-use egui::{Ui, ScrollArea, SelectableLabel, RichText, Context, Align, Layout};
+use egui::{Align, Context, Layout, RichText, ScrollArea, SelectableLabel, Ui};
 
-pub fn tab_ui(ui: &mut Ui, data: Vec<String>, selected: String, mut handler: impl FnMut(&Context, String)) {
+pub fn tab_ui(
+    ui: &mut Ui,
+    data: Vec<String>,
+    selected: String,
+    mut handler: impl FnMut(&Context, String),
+) {
     let id = egui::Id::new("scrolled_tab");
     let scrolled_tab: String = ui.memory().data.get_temp(id).unwrap_or_default();
     ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
@@ -25,10 +30,8 @@ pub fn tab_ui(ui: &mut Ui, data: Vec<String>, selected: String, mut handler: imp
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
                     for tab in data.clone() {
-                        let select = SelectableLabel::new(
-                            selected == tab,
-                            RichText::new(&tab).heading()
-                        );
+                        let select =
+                            SelectableLabel::new(selected == tab, RichText::new(&tab).heading());
                         let response = ui.add(select);
                         if selected == tab && scrolled_tab != tab {
                             ui.memory().data.insert_temp(id, tab.clone());

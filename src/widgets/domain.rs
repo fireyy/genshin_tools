@@ -1,7 +1,7 @@
-use crate::types::Domain;
 use crate::custom_grid;
-use crate::util::show_vision;
 use crate::custom_list;
+use crate::types::Domain;
+use crate::util::show_vision;
 
 pub struct DomainCard;
 
@@ -47,7 +47,10 @@ impl DomainCard {
                             ui,
                             ("Level", de.level.to_string()),
                             ("Adventure Experience", de.adventure_experience.to_string()),
-                            ("Companionship Experience", de.companionship_experience.to_string()),
+                            (
+                                "Companionship Experience",
+                                de.companionship_experience.to_string()
+                            ),
                             ("Mora", de.mora.to_string())
                         );
                         if !de.drops.is_empty() {

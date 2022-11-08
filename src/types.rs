@@ -32,7 +32,8 @@ impl Category {
             "nations" => Icon::COMPASS.icon,
             "weapons" => Icon::WEAPON.icon,
             _ => Icon::AMBER.icon,
-        }.to_string()
+        }
+        .to_string()
     }
 }
 
@@ -44,7 +45,7 @@ pub struct ArtifactSet {
     pub two_piece_bonus: String,
     #[serde(rename = "4-piece_bonus", default = "default_string")]
     pub four_piece_bonus: String,
-    #[serde(skip, default="default_vec")]
+    #[serde(skip, default = "default_vec")]
     pub icon: Vec<String>,
 }
 
@@ -53,7 +54,7 @@ pub struct Artifact {
     pub name: String,
     pub rarity: String,
     pub set: String,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 
@@ -76,7 +77,7 @@ pub struct Character {
     pub vision_key: String,
     pub weapon: String,
     pub weapon_type: String,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 
@@ -103,7 +104,7 @@ pub struct Food {
     pub recipe: Vec<Recipe>,
     #[serde(rename = "type")]
     pub food_type: String,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 
@@ -123,7 +124,7 @@ pub struct Potion {
     pub name: String,
     pub rarity: u8,
     pub crafting: Vec<Recipe>,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 
@@ -139,7 +140,7 @@ pub struct Domain {
     pub rewards: Vec<Reward>,
     #[serde(rename = "type")]
     pub domain_type: String,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 
@@ -151,7 +152,7 @@ pub struct Requirement {
     #[serde(rename = "leyLineDisorder")]
     pub ley_line_disorder: Vec<String>,
     #[serde(rename = "recommendedLevel")]
-    pub recommended_level: u8
+    pub recommended_level: u8,
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]
@@ -190,7 +191,7 @@ pub struct Element {
     pub key: String,
     pub name: String,
     pub reactions: Vec<Reaction>,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 
@@ -203,25 +204,28 @@ pub struct Reaction {
 
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Enemy {
-    #[serde(default="default_artifact")]
+    #[serde(default = "default_artifact")]
     pub artifacts: Vec<Artifact>,
     pub description: String,
-    #[serde(default="default_enemy_drop")]
+    #[serde(default = "default_enemy_drop")]
     pub drops: Vec<EnemyDrop>,
-    #[serde(rename = "elemental-description", default="default_elemental_description")]
+    #[serde(
+        rename = "elemental-description",
+        default = "default_elemental_description"
+    )]
     pub elemental_description: Vec<ElementalDescription>,
     pub elements: Vec<String>,
-    #[serde(default="default_string")]
+    #[serde(default = "default_string")]
     pub faction: String,
     pub family: String,
     pub id: String,
-    #[serde(rename = "mora-gained", default="default_usize")]
+    #[serde(rename = "mora-gained", default = "default_usize")]
     pub mora_gained: u8,
     pub name: String,
     pub region: String,
     #[serde(rename = "type")]
     pub enemy_type: String,
-    #[serde(skip, default="default_string")]
+    #[serde(skip, default = "default_string")]
     pub icon: String,
 }
 

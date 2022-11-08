@@ -1,6 +1,6 @@
+use super::item;
 use crate::images::NetworkImages;
 use crate::types::Food;
-use super::item;
 
 pub struct FoodCard;
 

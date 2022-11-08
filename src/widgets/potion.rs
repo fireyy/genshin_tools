@@ -1,6 +1,6 @@
+use super::item;
 use crate::images::NetworkImages;
 use crate::types::Potion;
-use super::item;
 
 pub struct PotionCard;
 

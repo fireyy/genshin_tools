@@ -1,19 +1,14 @@
-use eframe::egui::{
-    Ui, Frame, vec2,
-};
 use crate::images::NetworkImages;
 use crate::types::Element;
 use crate::util::show_vision;
+use eframe::egui::{vec2, Frame, Ui};
 
 pub struct ElementCard;
 
 impl ElementCard {
     pub fn show(ui: &mut Ui, data: Element, images: &NetworkImages) {
         ui.vertical(|ui| {
-            Frame {
-                ..Frame::default()
-            }
-            .show(ui, |ui| {
+            Frame { ..Frame::default() }.show(ui, |ui| {
                 ui.set_width(64.0);
                 ui.set_height(64.0);
                 if let Some(img) = images.get_image(data.icon) {

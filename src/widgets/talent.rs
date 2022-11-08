@@ -1,8 +1,6 @@
-use eframe::egui::{
-    Ui, Frame, Color32, Rounding, style::Margin,
-};
 use crate::images::NetworkImages;
 use crate::types::Talent;
+use eframe::egui::{style::Margin, Color32, Frame, Rounding, Ui};
 
 pub struct TalentCard;
 

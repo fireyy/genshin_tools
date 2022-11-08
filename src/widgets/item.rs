@@ -1,11 +1,16 @@
 use crate::images::NetworkImages;
-use crate::util::gen_star;
 use crate::theme::text_ellipsis;
+use crate::util::gen_star;
 
-pub fn item_ui(ui: &mut egui::Ui, icon: String, name: String, rarity: u8, images: &NetworkImages) -> egui::Response {
+pub fn item_ui(
+    ui: &mut egui::Ui,
+    icon: String,
+    name: String,
+    rarity: u8,
+    images: &NetworkImages,
+) -> egui::Response {
     let initial_size = egui::vec2(
-        100.0,
-        150.0, // Assume there will be
+        100.0, 150.0, // Assume there will be
     );
     let (rect, response) = ui.allocate_exact_size(initial_size, egui::Sense::click());
     if ui.is_rect_visible(rect) {
@@ -40,7 +45,12 @@ pub fn item_ui(ui: &mut egui::Ui, icon: String, name: String, rarity: u8, images
     response
 }
 
-pub fn item(icon: String, name: String, rarity: u8, images: &NetworkImages) -> impl egui::Widget + '_ {
+pub fn item(
+    icon: String,
+    name: String,
+    rarity: u8,
+    images: &NetworkImages,
+) -> impl egui::Widget + '_ {
     move |ui: &mut egui::Ui| item_ui(ui, icon, name, rarity, images)
 }
 

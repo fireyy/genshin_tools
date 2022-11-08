@@ -1,15 +1,17 @@
-use std::sync::mpsc;
-use anyhow::Result;
-use serde_json::Value;
-use tracing::{info};
-use egui_extras::RetainedImage;
-use std::collections::BTreeMap;
-use crate::images::NetworkImages;
 use crate::api;
-use crate::types::{Category, ArtifactSet, Character, Food, Potion, Domain, Element, Enemy};
-use crate::widgets::{tab_ui, ArtifactCard, CharacterCard, FoodCard, PotionCard, DomainCard, ElementCard, EnemyCard};
-use crate::util::{gen_artifact_icon, gen_icon_from_type};
+use crate::images::NetworkImages;
 use crate::theme::{setup_custom_fonts, Style};
+use crate::types::{ArtifactSet, Category, Character, Domain, Element, Enemy, Food, Potion};
+use crate::util::{gen_artifact_icon, gen_icon_from_type};
+use crate::widgets::{
+    tab_ui, ArtifactCard, CharacterCard, DomainCard, ElementCard, EnemyCard, FoodCard, PotionCard,
+};
+use anyhow::Result;
+use egui_extras::RetainedImage;
+use serde_json::Value;
+use std::collections::BTreeMap;
+use std::sync::mpsc;
+use tracing::info;
 
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
 
@@ -43,7 +45,7 @@ impl TemplateApp {
     const SAVE_KEY: &'static str = concat!(env!("CARGO_PKG_NAME"), "_", "categories");
 
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        let mut categories =  vec![];
+        let mut categories = vec![];
         if let Some(storage) = cc.storage {
             categories = eframe::get_value(storage, Self::SAVE_KEY).unwrap_or_default();
         }
@@ -126,9 +128,9 @@ impl TemplateApp {
             ui.centered_and_justified(|ui| {
                 ui.label("There are no data to display.");
             });
-            return Ok(())
+            return Ok(());
         }
-        
+
         match cate {
             "artifacts" => {
                 let mut data: ArtifactSet = serde_json::from_value(data)?;
@@ -140,7 +142,8 @@ impl TemplateApp {
             "characters" => {
                 let mut data: Character = serde_json::from_value(data)?;
                 // let img = gen_character_icon(&data.name);
-                let img = gen_icon_from_type(format!("characters/{}", data.name), "icon-big".into());
+                let img =
+                    gen_icon_from_type(format!("characters/{}", data.name), "icon-big".into());
                 data.icon = img.clone();
                 self.net_images.add(img);
                 CharacterCard::show(ui, data.clone(), &self.net_images);
@@ -151,32 +154,36 @@ impl TemplateApp {
                     "food" => {
                         let data: BTreeMap<String, Food> = serde_json::from_value(data)?;
                         ui.with_layout(
-                            egui::Layout::left_to_right(egui::Align::TOP)
-                                .with_main_wrap(true),
+                            egui::Layout::left_to_right(egui::Align::TOP).with_main_wrap(true),
                             |ui| {
                                 // ui.spacing_mut().item_spacing.x = 0.0;
                                 for (name, mut d) in data {
-                                    let img = gen_icon_from_type("consumables/food".to_string(), name.to_string());
+                                    let img = gen_icon_from_type(
+                                        "consumables/food".to_string(),
+                                        name.to_string(),
+                                    );
                                     d.icon = img.clone();
                                     self.net_images.add(img);
                                     FoodCard::show(ui, d.clone(), &self.net_images);
                                 }
-                            }
+                            },
                         );
                     }
                     "potions" => {
                         let data: BTreeMap<String, Potion> = serde_json::from_value(data)?;
                         ui.with_layout(
-                            egui::Layout::left_to_right(egui::Align::TOP)
-                                .with_main_wrap(true),
+                            egui::Layout::left_to_right(egui::Align::TOP).with_main_wrap(true),
                             |ui| {
                                 for (name, mut d) in data {
-                                    let img = gen_icon_from_type("consumables/potions".to_string(), name.to_string());
+                                    let img = gen_icon_from_type(
+                                        "consumables/potions".to_string(),
+                                        name.to_string(),
+                                    );
                                     d.icon = img.clone();
                                     self.net_images.add(img);
                                     PotionCard::show(ui, d.clone(), &self.net_images);
                                 }
-                            }
+                            },
                         );
                     }
                     _ => {}
@@ -252,35 +259,40 @@ impl eframe::App for TemplateApp {
         }
 
         egui::SidePanel::left("side_panel")
-        .resizable(false)
-        .min_width(150.0)
-        .show(ctx, |ui| {
-            self.logo.show_scaled(ui, 0.3);
-            ui.separator();
-            egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
-                    for cate in &self.categories.clone() {
-                        ui.style_mut().spacing.button_padding.y = 10.0;
-                        let select = egui::SelectableLabel::new(
-                            self.selected_category == cate.value, 
-                            egui::RichText::new(format!("{} {}", cate.clone().icon(), &cate.name)).heading()
-                        );
-                        if ui.add(select).clicked() && self.selected_category != cate.value {
-                            self.load_tab_data(ctx, cate.value.clone());
+            .resizable(false)
+            .min_width(150.0)
+            .show(ctx, |ui| {
+                self.logo.show_scaled(ui, 0.3);
+                ui.separator();
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
+                        for cate in &self.categories.clone() {
+                            ui.style_mut().spacing.button_padding.y = 10.0;
+                            let select = egui::SelectableLabel::new(
+                                self.selected_category == cate.value,
+                                egui::RichText::new(format!(
+                                    "{} {}",
+                                    cate.clone().icon(),
+                                    &cate.name
+                                ))
+                                .heading(),
+                            );
+                            if ui.add(select).clicked() && self.selected_category != cate.value {
+                                self.load_tab_data(ctx, cate.value.clone());
+                            }
                         }
-                    }
-                    if self.selected_category.is_empty() && !self.categories.is_empty() {
-                        self.load_tab_data(ctx, self.categories.first().unwrap().value.clone());
-                    }
+                        if self.selected_category.is_empty() && !self.categories.is_empty() {
+                            self.load_tab_data(ctx, self.categories.first().unwrap().value.clone());
+                        }
+                    });
                 });
             });
-        });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             tab_ui(ui, self.tabs.clone(), self.selected_tab.clone(), |a, b| {
                 self.load_data(a, b);
             });
-            
+
             ui.separator();
 
             match &mut self.state {
