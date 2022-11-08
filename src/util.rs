@@ -2,7 +2,7 @@ use crate::constants::{ARTIFACT_TYPE, GENSHINDEV_URL};
 use crate::theme::Icon;
 
 pub fn trans_string(name: String) -> String {
-    name.to_lowercase().replace(" ", "-").replace("'", "-")
+    name.to_lowercase().replace([' ', '\''], "-")
 }
 
 pub fn gen_artifact_icon(name: String) -> Vec<String> {
@@ -28,7 +28,7 @@ pub fn gen_star(rarity: u8) -> String {
     star
 }
 
-pub fn show_vision(vision: &String) -> String {
+pub fn show_vision(vision: &str) -> String {
     let str = match vision.to_uppercase().as_str() {
         "ANEMO" => Icon::ANEMO.icon,
         "CRYO" => Icon::CRYO.icon,

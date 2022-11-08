@@ -16,9 +16,9 @@ use tracing::info;
 const LOGO: &[u8] = include_bytes!("../assets/logo.png");
 
 enum Update {
-    CategoriesLoaded(Result<Vec<Category>>),
-    TabsLoaded(Result<Vec<String>>),
-    DataLoaded(Result<Value>),
+    Categories(Result<Vec<Category>>),
+    Tabs(Result<Vec<String>>),
+    Data(Result<Value>),
 }
 
 enum State {
@@ -86,7 +86,7 @@ impl TemplateApp {
         let ctx = ctx.clone();
 
         api::load_category(move |data| {
-            update_tx.send(Update::CategoriesLoaded(data)).unwrap();
+            update_tx.send(Update::Categories(data)).unwrap();
             ctx.request_repaint();
         });
     }
@@ -101,7 +101,7 @@ impl TemplateApp {
         let ctx = ctx.clone();
 
         api::load_tab_data(path, move |data| {
-            update_tx.send(Update::TabsLoaded(data)).unwrap();
+            update_tx.send(Update::Tabs(data)).unwrap();
             ctx.request_repaint();
         });
     }
@@ -115,7 +115,7 @@ impl TemplateApp {
         let path = format!("{}/{}", self.selected_category, path);
 
         api::load_data(path, move |data| {
-            update_tx.send(Update::DataLoaded(data)).unwrap();
+            update_tx.send(Update::Data(data)).unwrap();
             ctx.request_repaint();
         });
     }
@@ -137,7 +137,7 @@ impl TemplateApp {
                 let imgs = gen_artifact_icon(data.name.clone());
                 data.icon = imgs.clone();
                 self.net_images.add_all(imgs);
-                ArtifactCard::show(ui, data.clone(), &self.net_images);
+                ArtifactCard::show(ui, data, &self.net_images);
             }
             "characters" => {
                 let mut data: Character = serde_json::from_value(data)?;
@@ -146,7 +146,7 @@ impl TemplateApp {
                     gen_icon_from_type(format!("characters/{}", data.name), "icon-big".into());
                 data.icon = img.clone();
                 self.net_images.add(img);
-                CharacterCard::show(ui, data.clone(), &self.net_images);
+                CharacterCard::show(ui, data, &self.net_images);
             }
             "consumables" => {
                 let tab = self.selected_tab.as_str();
@@ -191,21 +191,21 @@ impl TemplateApp {
             }
             "domains" => {
                 let data: Domain = serde_json::from_value(data)?;
-                DomainCard::show(ui, data.clone());
+                DomainCard::show(ui, data);
             }
             "elements" => {
                 let mut data: Element = serde_json::from_value(data)?;
                 let img = gen_icon_from_type(format!("elements/{}", data.name), "icon".into());
                 data.icon = img.clone();
                 self.net_images.add(img);
-                ElementCard::show(ui, data.clone(), &self.net_images);
+                ElementCard::show(ui, data, &self.net_images);
             }
             "enemies" => {
                 let mut data: Enemy = serde_json::from_value(data)?;
                 let img = gen_icon_from_type(format!("enemies/{}", data.name), "icon".into());
                 data.icon = img.clone();
                 self.net_images.add(img);
-                EnemyCard::show(ui, data.clone(), &self.net_images);
+                EnemyCard::show(ui, data, &self.net_images);
             }
             _ => {
                 ui.centered_and_justified(|ui| {
@@ -225,7 +225,7 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         while let Ok(update) = self.update_rx.try_recv() {
             match update {
-                Update::CategoriesLoaded(result) => match result {
+                Update::Categories(result) => match result {
                     Ok(data) => {
                         self.state = State::Idle;
                         self.categories = data;
@@ -235,7 +235,7 @@ impl eframe::App for TemplateApp {
                         self.load_err = Some(err.to_string());
                     }
                 },
-                Update::TabsLoaded(result) => match result {
+                Update::Tabs(result) => match result {
                     Ok(data) => {
                         self.state = State::Idle;
                         self.tabs = data;
@@ -245,7 +245,7 @@ impl eframe::App for TemplateApp {
                         self.load_err = Some(err.to_string());
                     }
                 },
-                Update::DataLoaded(result) => match result {
+                Update::Data(result) => match result {
                     Ok(data) => {
                         self.state = State::Idle;
                         self.data = data;

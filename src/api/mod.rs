@@ -39,7 +39,7 @@ pub fn load_category(callback: impl 'static + Send + FnOnce(Result<Vec<Category>
 }
 
 pub fn load_data(path: String, callback: impl 'static + Send + FnOnce(Result<Value>)) {
-    GenshinDev::fetch(format!("{path}"), |result| match result {
+    GenshinDev::fetch(path, |result| match result {
         Ok(res) => match res.text() {
             Some(text) => {
                 let val: Value = serde_json::from_str(text).unwrap();
@@ -53,7 +53,7 @@ pub fn load_data(path: String, callback: impl 'static + Send + FnOnce(Result<Val
 }
 
 pub fn load_tab_data(path: String, callback: impl 'static + Send + FnOnce(Result<Vec<String>>)) {
-    GenshinDev::fetch(format!("{path}"), |result| match result {
+    GenshinDev::fetch(path, |result| match result {
         Ok(res) => match res.text() {
             Some(text) => {
                 let val: Vec<String> = serde_json::from_str(text).unwrap();

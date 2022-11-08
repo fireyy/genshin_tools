@@ -18,14 +18,11 @@ pub struct NetworkImages {
 #[cfg(not(target_arch = "wasm32"))]
 impl NetworkImages {
     pub fn new(ctx: egui::Context) -> Self {
-        let path = match ProjectDirs::from("com", "fireyy", "Genshin Tools") {
-            Some(proj_dirs) => Some(proj_dirs.config_dir().to_path_buf()),
-            None => None,
-        };
+        let path = ProjectDirs::from("com", "fireyy", "Genshin Tools").map(|proj_dirs| proj_dirs.config_dir().to_path_buf());
         let image_store = ImageStore::<Image>::new(path);
         Self {
             image_store: image_store.clone(),
-            fetch_queue: FetchQueue::create(ctx.clone(), image_store),
+            fetch_queue: FetchQueue::create(ctx, image_store),
             caches: ImageCache::default(),
             requested_images: HashSet::new(),
         }
@@ -84,7 +81,7 @@ impl NetworkImages {
         Image {
             id: uuid,
             kind: ImageKind::Display,
-            url: url.clone(),
+            url,
             meta: (),
         }
     }
