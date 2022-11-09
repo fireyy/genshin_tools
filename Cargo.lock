@@ -772,7 +772,7 @@ dependencies = [
 
 [[package]]
 name = "genshin_tools"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "cached_network_image",
@@ -783,6 +783,7 @@ dependencies = [
  "egui_extras",
  "ehttp",
  "image",
+ "lru",
  "once_cell",
  "serde",
  "serde_json",
@@ -1061,6 +1062,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "lru"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6e8aaa3f231bb4bd57b84b2d5dc3ae7f350265df8aa96492e0bc394a1571909"
+dependencies = [
+ "hashbrown",
 ]
 
 [[package]]
